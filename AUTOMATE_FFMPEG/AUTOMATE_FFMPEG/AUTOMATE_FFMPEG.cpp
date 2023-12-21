@@ -16,8 +16,23 @@ void processVideoFile(const std::string& filePath) {
 
 
     // Tutaj umieœæ logikê dotycz¹c¹ FFmpeg
-    std::cout << "Przetwarzanie pliku: " << filePath <<std::endl;
+   // std::cout << "Przetwarzanie pliku: " << filePath <<std::endl;
   //  probe.displayStreams();
+
+    std::cout << "Przetwarzanie pliku: " << filePath << std::endl;
+
+    std::string inputFilePath = filePath;
+    std::string outputDirectory = "test1";
+    int maxResolution = 1080; // Maksymalna rozdzielczoœæ
+    int cqValue = 23; // Wartoœæ CQ
+    std::string additionalFlags = "-additionalFlag1 value1 -additionalFlag2 value2";
+
+    FFmpegCommandBuilder builder(inputFilePath, outputDirectory, maxResolution, cqValue, additionalFlags);
+    std::string command = builder.buildCommand();
+    std::cout << "Wygenerowane polecenie FFmpeg: " << command << std::endl;
+
+
+
 }
 
 
@@ -36,10 +51,16 @@ void funkcja2() {
     probe.analyze();
     probe.displayStreams();*/
 
-    std::string filePath = R"("C:\GIT_REPO\AUTOMATE_FFMPEG\AUTOMATE_FFMPEG\AUTOMATE_FFMPEG\AUTOMATE_FFMPEG\TEST\Nowy folder\input4.mp4")";
-    FFmpegCommandBuilder builder(filePath);
+    std::string inputFilePath = R"(C:\GIT_REPO\AUTOMATE_FFMPEG\AUTOMATE_FFMPEG\AUTOMATE_FFMPEG\AUTOMATE_FFMPEG\TEST\Nowy folder\input4.mp4)";
+    std::string outputDirectory = "test1";
+    int maxResolution = 1080; // Maksymalna rozdzielczoœæ
+    int cqValue = 23; // Wartoœæ CQ
+    std::string additionalFlags = "-additionalFlag1 value1 -additionalFlag2 value2";
+
+    FFmpegCommandBuilder builder(inputFilePath, outputDirectory, maxResolution, cqValue, additionalFlags);
     std::string command = builder.buildCommand();
     std::cout << "Wygenerowane polecenie FFmpeg: " << command << std::endl;
+
 }
 
 
