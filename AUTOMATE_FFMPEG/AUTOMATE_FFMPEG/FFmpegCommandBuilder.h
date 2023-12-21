@@ -5,13 +5,19 @@
 #include <vector>
 #include "FFProbe.h"
 
+enum class EncoderType {
+    CPU,
+    GPU
+};
+
 class FFmpegCommandBuilder {
 public:
     FFmpegCommandBuilder(const std::string& inputFilePath, const std::string& outputDirectory,
         int maxResolution, int cqValue, const std::string& additionalFlags,
         const std::vector<int>& videoStreams,
         const std::vector<int>& audioStreams,
-        const std::vector<int>& subtitleStreams);
+        const std::vector<int>& subtitleStreams,
+        EncoderType encoderType);
 
     std::string buildCommand();
 
@@ -25,11 +31,13 @@ private:
     std::vector<int> videoStreams;
     std::vector<int> audioStreams;
     std::vector<int> subtitleStreams;
+    EncoderType encoderType;
 
     bool checkAudioCodec(const nlohmann::json& stream) const;
     std::string createOutputFileName() const;
     std::string generateVideoFilter() const;
     std::string generateStreamSelectors();
+    std::string generateEncoderOptions() const;
 };
 
 #endif // FFMPEGCOMMANDBUILDER_H

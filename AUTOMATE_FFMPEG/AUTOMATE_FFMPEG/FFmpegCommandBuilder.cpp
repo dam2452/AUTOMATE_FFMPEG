@@ -11,11 +11,12 @@ FFmpegCommandBuilder::FFmpegCommandBuilder(const std::string& inputFilePath,
     const std::string& additionalFlags,
     const std::vector<int>& videoStreams,
     const std::vector<int>& audioStreams,
-    const std::vector<int>& subtitleStreams)
+    const std::vector<int>& subtitleStreams,
+    EncoderType encoderType)
     : inputFilePath(inputFilePath), outputDirectory(outputDirectory),
     maxResolution(maxResolution), cqValue(cqValue), additionalFlags(additionalFlags),
     ffprobe(inputFilePath), videoStreams(videoStreams), audioStreams(audioStreams),
-    subtitleStreams(subtitleStreams) {
+    subtitleStreams(subtitleStreams), encoderType(encoderType) {
     // Dodatkowa logika inicjalizacyjna, jeœli jest potrzebna
 }
 
@@ -52,7 +53,7 @@ std::string FFmpegCommandBuilder::buildCommand() {
     }
 
     // Video processing
-    cmd << " -c:v hevc_nvenc";
+    cmd << generateEncoderOptions();
     std::string vf = generateVideoFilter();
     if (!vf.empty()) {
         cmd << " -vf \"" << vf << "\"";
@@ -111,4 +112,16 @@ std::string FFmpegCommandBuilder::generateStreamSelectors() {
     }
 
     return selectors.str();
+}
+
+std::string FFmpegCommandBuilder::generateEncoderOptions() const {
+    std::ostringstream encoderOptions;
+    if (encoderType == EncoderType::GPU) {
+        encoderOptions << " -c:v hevc_nvenc";
+    }
+    else if (encoderType == EncoderType::CPU) {
+        encoderOptions << " -c:v libx265 -cpu-used 4 -threads 16 -tile-columns 2 -tile-rows 1 -row-mt 1 -speed 2 -auto-alt-ref 1 -lag-in-frames 25";
+        // Mo¿esz dodaæ opcje wielow¹tkowoœci, np. threads=16, jeœli chcesz ograniczyæ liczbê w¹tków
+    }
+    return encoderOptions.str();
 }
