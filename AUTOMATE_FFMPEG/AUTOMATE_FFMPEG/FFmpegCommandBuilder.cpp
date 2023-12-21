@@ -5,9 +5,18 @@
 
 namespace fs = std::filesystem;
 
-FFmpegCommandBuilder::FFmpegCommandBuilder(const std::string& inputFilePath, const std::string& outputDirectory, int maxResolution, int cqValue, const std::string& additionalFlags)
-    : inputFilePath(inputFilePath), outputDirectory(outputDirectory), maxResolution(maxResolution), cqValue(cqValue), additionalFlags(additionalFlags), ffprobe(inputFilePath) {
-    // Tutaj mo¿na dodaæ dodatkow¹ logikê inicjalizacyjn¹, jeœli jest potrzebna
+FFmpegCommandBuilder::FFmpegCommandBuilder(const std::string& inputFilePath,
+    const std::string& outputDirectory,
+    int maxResolution, int cqValue,
+    const std::string& additionalFlags,
+    const std::vector<int>& videoStreams,
+    const std::vector<int>& audioStreams,
+    const std::vector<int>& subtitleStreams)
+    : inputFilePath(inputFilePath), outputDirectory(outputDirectory),
+    maxResolution(maxResolution), cqValue(cqValue), additionalFlags(additionalFlags),
+    ffprobe(inputFilePath), videoStreams(videoStreams), audioStreams(audioStreams),
+    subtitleStreams(subtitleStreams) {
+    // Dodatkowa logika inicjalizacyjna, jeœli jest potrzebna
 }
 
 bool FFmpegCommandBuilder::checkAudioCodec(const nlohmann::json& stream) const {
@@ -22,27 +31,32 @@ std::string FFmpegCommandBuilder::buildCommand() {
     std::ostringstream cmd;
     cmd << "ffmpeg -i \"" << inputFilePath << "\"";
 
+    // Stream selectors
+    cmd << generateStreamSelectors();
+
     // Audio processing
-    bool audioProcessed = false;
+    bool audioNeedConversion = false;
     for (const auto& stream : streams) {
-        if (stream["codec_type"] == "audio") {
-            if (!checkAudioCodec(stream)) {
-                cmd << " -c:a aac";
-                audioProcessed = true;
-                break;
-            }
+        if (stream["codec_type"] == "audio" &&
+            !(stream["codec_name"] == "aac" || stream["codec_name"] == "eac3")) {
+            audioNeedConversion = true;
+            break;
         }
     }
-    if (!audioProcessed) {
+
+    if (audioNeedConversion) {
+        cmd << " -c:a aac";
+    }
+    else {
         cmd << " -c:a copy";
     }
 
     // Video processing
+    cmd << " -c:v hevc_nvenc";
     std::string vf = generateVideoFilter();
     if (!vf.empty()) {
         cmd << " -vf \"" << vf << "\"";
     }
-    cmd << " -c:v hevc_nvenc -cq:v " << cqValue;
 
     // Subtitles processing
     cmd << " -c:s copy";
@@ -70,4 +84,31 @@ std::string FFmpegCommandBuilder::generateVideoFilter() const {
         return "scale=-1:min(" + std::to_string(maxResolution) + "\\,ih)";
     }
     return "";
+}
+
+std::string FFmpegCommandBuilder::generateStreamSelectors() {
+    std::ostringstream selectors;
+
+    // Video stream selectors
+    if (!videoStreams.empty()) {
+        for (int stream : videoStreams) {
+            selectors << " -map 0:v:" << stream;
+        }
+    }
+
+    // Audio stream selectors
+    if (!audioStreams.empty()) {
+        for (int stream : audioStreams) {
+            selectors << " -map 0:a:" << stream;
+        }
+    }
+
+    // Subtitle stream selectors
+    if (!subtitleStreams.empty()) {
+        for (int stream : subtitleStreams) {
+            selectors << " -map 0:s:" << stream;
+        }
+    }
+
+    return selectors.str();
 }

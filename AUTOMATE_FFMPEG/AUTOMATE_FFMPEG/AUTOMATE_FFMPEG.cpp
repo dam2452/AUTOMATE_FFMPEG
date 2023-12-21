@@ -21,13 +21,16 @@ void processVideoFile(const std::string& filePath) {
 
     std::cout << "Przetwarzanie pliku: " << filePath << std::endl;
 
-    std::string inputFilePath = filePath;
-    std::string outputDirectory = "test1";
-    int maxResolution = 1080; // Maksymalna rozdzielczoœæ
-    int cqValue = 23; // Wartoœæ CQ
+    std::string inputFilePath = "œcie¿ka/do/pliku.mkv";
+    std::string outputDirectory = "œcie¿ka/do/katalogu/wyjœciowego";
+    int maxResolution = 1080;
+    int cqValue = 23;
     std::string additionalFlags = "-additionalFlag1 value1 -additionalFlag2 value2";
+    std::vector<int> videoStreams = { 0 }; // Wybrany strumieñ wideo
+    std::vector<int> audioStreams = { 0, 1 }; // Wybrane strumienie audio
+    std::vector<int> subtitleStreams = { 0, 1, 2 }; // Wybrane strumienie napisów
 
-    FFmpegCommandBuilder builder(inputFilePath, outputDirectory, maxResolution, cqValue, additionalFlags);
+    FFmpegCommandBuilder builder(inputFilePath, outputDirectory, maxResolution, cqValue, additionalFlags, videoStreams, audioStreams, subtitleStreams);
     std::string command = builder.buildCommand();
     std::cout << "Wygenerowane polecenie FFmpeg: " << command << std::endl;
 
@@ -51,13 +54,16 @@ void funkcja2() {
     probe.analyze();
     probe.displayStreams();*/
 
-    std::string inputFilePath = R"(C:\GIT_REPO\AUTOMATE_FFMPEG\AUTOMATE_FFMPEG\AUTOMATE_FFMPEG\AUTOMATE_FFMPEG\TEST\Nowy folder\input4.mp4)";
+    std::string inputFilePath = "test";
     std::string outputDirectory = "test1";
-    int maxResolution = 1080; // Maksymalna rozdzielczoœæ
-    int cqValue = 23; // Wartoœæ CQ
+    int maxResolution = 1080;
+    int cqValue = 23;
     std::string additionalFlags = "-additionalFlag1 value1 -additionalFlag2 value2";
+    std::vector<int> videoStreams = { 0 }; // Wybrany strumieñ wideo
+    std::vector<int> audioStreams = { 0, 1 }; // Wybrane strumienie audio
+    std::vector<int> subtitleStreams = { 0, 1, 2 }; // Wybrane strumienie napisów
 
-    FFmpegCommandBuilder builder(inputFilePath, outputDirectory, maxResolution, cqValue, additionalFlags);
+    FFmpegCommandBuilder builder(inputFilePath, outputDirectory, maxResolution, cqValue, additionalFlags, videoStreams, audioStreams, subtitleStreams);
     std::string command = builder.buildCommand();
     std::cout << "Wygenerowane polecenie FFmpeg: " << command << std::endl;
 
