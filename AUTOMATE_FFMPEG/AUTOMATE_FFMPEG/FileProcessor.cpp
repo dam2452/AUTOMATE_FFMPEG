@@ -1,25 +1,42 @@
 #include "FileProcessor.h"
 #include <filesystem>
 #include <iostream>
+#include "ProgressBar.h"
 
 namespace fs = std::filesystem;
 
 FileProcessor::FileProcessor(const std::string& sourceDir, const std::string& targetDir)
     : sourceDirectory(sourceDir), targetDirectory(targetDir) {}
 
-void FileProcessor::processFiles(std::function<void(const std::string&)> fileAction) {
-    fs::path sourcePath(sourceDirectory);
+void FileProcessor::processFiles(std::function<void(const std::string&, const std::string&)> fileAction) {
     fs::path targetPath(targetDirectory);
-    copyDirectory(sourcePath, targetPath);
+    copyDirectory(sourceDirectory, targetPath);
+
+    // Utwórz ProgressBar
+    int totalFiles = std::count_if(fs::recursive_directory_iterator(targetPath),
+        fs::recursive_directory_iterator{},
+        [](const auto& entry) { return entry.is_regular_file(); });
+    ProgressBar progressBar(totalFiles);
+
     for (const auto& entry : fs::recursive_directory_iterator(targetPath)) {
         if (entry.is_regular_file()) {
-            const auto& path = entry.path();
-            if (path.extension() == ".mkv" || path.extension() == ".ts" ||
-                path.extension() == ".mp4" || path.extension() == ".avi") {
-                fileAction(path.string());
+            fs::path outputPath = targetPath / entry.path().filename();
+            outputPath.replace_extension("_converted.mkv");
+
+            // Pomijanie jeœli plik ju¿ istnieje
+            if (!fs::exists(outputPath)) {
+                try {
+                    fileAction(entry.path().string(), targetDirectory);
+                }
+                catch (...) {
+                    // Obs³uga b³êdów, opcjonalnie usuñ niekompletny plik
+                    fs::remove(outputPath);
+                }
             }
+            progressBar.update(progressBar.getCurrent() + 1);
         }
     }
+    progressBar.complete();
 }
 
 void FileProcessor::copyDirectory(const fs::path& source, const fs::path& target) {

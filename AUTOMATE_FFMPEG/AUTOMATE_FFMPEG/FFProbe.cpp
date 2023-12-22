@@ -12,7 +12,7 @@ using json = nlohmann::json;
 FFProbe::FFProbe(const std::string& filePath) : filePath(filePath) {}
 
 void FFProbe::analyze() {
-    std::string command = "ffprobe -v quiet -print_format json -show_streams " + filePath + " > ffprobe_output.json";
+    std::string command = "ffprobe -v quiet -print_format json -show_streams " + std::string("\"") + filePath + std::string("\"") + " > ffprobe_output.json";
     std::system(command.c_str());
 
     std::ifstream file("ffprobe_output.json");

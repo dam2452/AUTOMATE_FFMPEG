@@ -134,6 +134,7 @@
     <ClCompile Include="FFProbe.cpp" />
     <ClCompile Include="FileProcessor.cpp" />
     <ClCompile Include="menu.cpp" />
+    <ClCompile Include="ProgressBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commands.h" />
@@ -141,6 +142,7 @@
     <ClInclude Include="FFProbe.h" />
     <ClInclude Include="FileProcessor.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="ProgressBar.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
