@@ -9,33 +9,35 @@ FileProcessor::FileProcessor(const std::string& sourceDir, const std::string& ta
     : sourceDirectory(sourceDir), targetDirectory(targetDir) {}
 
 void FileProcessor::processFiles(std::function<void(const std::string&, const std::string&)> fileAction) {
-    fs::path targetPath(targetDirectory);
-    copyDirectory(sourceDirectory, targetPath);
+    // Nie kopiujemy ju¿ katalogu, tylko przetwarzamy pliki bezpoœrednio
 
-    // Utwórz ProgressBar
-    int totalFiles = std::count_if(fs::recursive_directory_iterator(targetPath),
+    fs::path sourcePath(sourceDirectory);
+    fs::path targetPath(targetDirectory);
+    fs::create_directories(targetPath);  // Upewnij siê, ¿e katalog docelowy istnieje
+
+    int totalFiles = std::count_if(fs::recursive_directory_iterator(sourcePath),
         fs::recursive_directory_iterator{},
         [](const auto& entry) { return entry.is_regular_file(); });
     ProgressBar progressBar(totalFiles);
-    //int currentFile = 0;
     int processedFiles = 0;
-    for (const auto& entry : fs::recursive_directory_iterator(targetPath)) {
+
+    for (const auto& entry : fs::recursive_directory_iterator(sourcePath)) {
         if (entry.is_regular_file()) {
             fs::path outputPath = targetPath / entry.path().filename();
-            outputPath.replace_extension("_converted.mp4");
+            //outputPath.replace_extension("_converted.mp4");
 
-            if (!fs::exists(outputPath)) {  // SprawdŸ, czy plik wyjœciowy ju¿ istnieje
-                fileAction(entry.path().string(), targetDirectory);
-                processedFiles++;  // Zwiêksz licznik przetworzonych plików
+            if (!fs::exists(outputPath)) {
+                fileAction(entry.path().string(), outputPath.string());
+                processedFiles++;
             }
 
-            // Aktualizuj pasek postêpu na podstawie przetworzonych plików
             progressBar.update(processedFiles);
         }
     }
 
     progressBar.complete();
 }
+
 
 void FileProcessor::copyDirectory(const fs::path& source, const fs::path& target) {
     try {

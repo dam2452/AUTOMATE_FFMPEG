@@ -17,7 +17,7 @@ public:
         const std::vector<int>& videoStreams,
         const std::vector<int>& audioStreams,
         const std::vector<int>& subtitleStreams,
-        EncoderType encoderType);
+        EncoderType encoderType, std::string extension);
 
     std::string buildCommand();
 
@@ -32,6 +32,8 @@ private:
     std::vector<int> audioStreams;
     std::vector<int> subtitleStreams;
     EncoderType encoderType;
+    std::string extension;
+
 
     bool checkAudioCodec(const nlohmann::json& stream) const;
     std::string createOutputFileName() const;

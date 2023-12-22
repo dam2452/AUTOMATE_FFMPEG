@@ -2,6 +2,7 @@
 #include "FFProbe.h"
 #include <sstream>
 #include <filesystem>
+#include <string>
 
 namespace fs = std::filesystem;
 
@@ -12,11 +13,11 @@ FFmpegCommandBuilder::FFmpegCommandBuilder(const std::string& inputFilePath,
     const std::vector<int>& videoStreams,
     const std::vector<int>& audioStreams,
     const std::vector<int>& subtitleStreams,
-    EncoderType encoderType)
+    EncoderType encoderType, std::string extension)
     : inputFilePath(inputFilePath), outputDirectory(outputDirectory),
     maxResolution(maxResolution), cqValue(cqValue), additionalFlags(additionalFlags),
     ffprobe(inputFilePath), videoStreams(videoStreams), audioStreams(audioStreams),
-    subtitleStreams(subtitleStreams), encoderType(encoderType) {
+    subtitleStreams(subtitleStreams), encoderType(encoderType), extension(extension){
     // Dodatkowa logika inicjalizacyjna, jeœli jest potrzebna
 }
 
@@ -75,10 +76,19 @@ std::string FFmpegCommandBuilder::buildCommand() {
 }
 
 std::string FFmpegCommandBuilder::createOutputFileName() const {
-    fs::path inputPath(inputFilePath);
-    std::string baseName = inputPath.stem().string() + "_converted_CQ" + std::to_string(cqValue);
-    return (fs::path(outputDirectory) / baseName).replace_extension(".mp4").string();
+ //   fs::path inputPath(inputFilePath);
+ //   std::string newFileName = inputPath.stem().string() + "_converted_CQ" + std::to_string(cqValue) + inputPath.extension().string();
+   // fs::path outputPath(outputDirectory);
+
+    std::string outputDirectoryCopy = outputDirectory;
+    if (outputDirectoryCopy.size() >= 4) {
+        outputDirectoryCopy.erase(outputDirectoryCopy.size() - 4);  // Usuwa ostatnie trzy znaki
+    }
+
+    return outputDirectoryCopy + "_CQ" + std::to_string(cqValue) + extension;
 }
+
+
 
 std::string FFmpegCommandBuilder::generateVideoFilter() const {
     if (maxResolution > 0) {
