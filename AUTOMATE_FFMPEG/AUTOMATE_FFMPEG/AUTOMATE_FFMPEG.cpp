@@ -171,6 +171,30 @@ void selectResLimit() {
     std::cout << std::endl;
 }
 
+void chooseEncoderType() {
+	std::cout << "Wybierz typ enkodera: ";
+
+	// Usuniêcie pozosta³oœci w buforze wejœciowym
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	std::string input;
+
+	std::getline(std::cin, input);
+
+    if (input == "CPU") {
+		encoderType = EncoderType::CPU;
+	}
+    else if (input == "GPU") {
+		encoderType = EncoderType::GPU;
+	}
+    else {
+		std::cout << "Nieprawidlowy typ enkodera! Nacisnij Enter, aby kontynuowac..." << std::endl;
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignorowanie bufora
+		return;
+	}
+	std::cout << "Wybrany typ enkodera: " << input;
+	std::cout << std::endl;
+}
+
 
 
 int main()
@@ -184,6 +208,7 @@ int main()
     menu.addItem("Wybierz strumienie wideo", selectVideoStreams);
     menu.addItem("Wybierz CQ", selectCQ);
     menu.addItem("Wybierz limit rozdzielczosci", selectResLimit);
+    menu.addItem("Wybierz typ enkodera", chooseEncoderType);
 
     menu.run();
 
