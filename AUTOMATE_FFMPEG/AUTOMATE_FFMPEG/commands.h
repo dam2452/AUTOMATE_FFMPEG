@@ -5,7 +5,7 @@
 
 class Commands {
 public:
-    static std::string execute(const std::string& cmd);
+    static std::string execute(const std::string& cmd, bool filterFFmpegSpeed = false);
     static std::string checkFFmpegVersion();
     static void installFFmpegWindows();
     static void installFFmpegLinux();

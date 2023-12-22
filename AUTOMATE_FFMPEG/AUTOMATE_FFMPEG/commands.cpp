@@ -5,21 +5,35 @@
 
 #ifdef _WIN32
 // Implementacja dla Windows
-std::string Commands::execute(const std::string& cmd) {
+std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
     std::array<char, 128> buffer;
-    std::string result;
     std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
     if (!pipe) {
-        throw std::runtime_error("_popen() failed!");
+        throw std::runtime_error("popen() failed!");
     }
+
+    std::string result;
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        result += buffer.data();
-}
+        std::string line = buffer.data();
+
+        if (filterFFmpegSpeed) {
+            if (line.find("speed=") != std::string::npos) {
+                // Wyœwietla tylko linie zawieraj¹ce "speed"
+                std::cout << line.substr(line.find("speed=")) << std::endl;
+                break;
+            }
+        }
+        else {
+            result += line;
+        }
+    }
+
     return result;
 }
+
 #else
 // Implementacja dla Linux
-std::string Commands::execute(const std::string& cmd) {
+std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
     std::array<char, 128> buffer;
     std::string result;
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
@@ -27,11 +41,20 @@ std::string Commands::execute(const std::string& cmd) {
         throw std::runtime_error("popen() failed!");
     }
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        result += buffer.data();
+        std::string line = buffer.data();
+        if (filterFFmpegSpeed) {
+            if (line.find("speed=") != std::string::npos) {
+                std::cout << line; // Wyœwietla tylko linie ze "speed"
+            }
+        }
+        else {
+            result += line;
+        }
     }
     return result;
 }
 #endif
+
 
 std::string Commands::checkFFmpegVersion() {
     try {

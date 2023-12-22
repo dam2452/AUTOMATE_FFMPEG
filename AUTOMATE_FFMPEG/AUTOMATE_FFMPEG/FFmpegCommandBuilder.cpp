@@ -27,6 +27,7 @@ bool FFmpegCommandBuilder::checkAudioCodec(const nlohmann::json& stream) const {
 }
 
 std::string FFmpegCommandBuilder::buildCommand() {
+
     ffprobe.analyze();
     auto streams = ffprobe.getStreams();
 
@@ -101,21 +102,30 @@ std::string FFmpegCommandBuilder::generateStreamSelectors() {
     std::ostringstream selectors;
 
     // Video stream selectors
-    if (!videoStreams.empty()) {
+    if (videoStreams.empty()) {
+        selectors << " -map 0:v";
+    }
+    else {
         for (int stream : videoStreams) {
             selectors << " -map 0:v:" << stream;
         }
     }
 
     // Audio stream selectors
-    if (!audioStreams.empty()) {
+    if (audioStreams.empty()) {
+        selectors << " -map 0:a";
+    }
+    else {
         for (int stream : audioStreams) {
             selectors << " -map 0:a:" << stream;
         }
     }
 
     // Subtitle stream selectors
-    if (!subtitleStreams.empty()) {
+    if (subtitleStreams.empty()) {
+        selectors << " -map 0:s";
+    }
+    else {
         for (int stream : subtitleStreams) {
             selectors << " -map 0:s:" << stream;
         }
