@@ -399,3 +399,4 @@ FodyWeavers.xsd
 *.mp4
 *.avi
 AUTOMATE_FFMPEG/AUTOMATE_FFMPEG/ffprobe_output.json
+AUTOMATE_FFMPEG/AUTOMATE_FFMPEG/ffprobe_output.json

@@ -26,8 +26,17 @@ void ProgressBar::display() const {
         auto estimatedTotalTime = static_cast<long long>(timeElapsed) * total / current;
         auto remainingTime = estimatedTotalTime - timeElapsed;
 
-        std::cout << ", Pozostaly czas: " << remainingTime << " s ";
+        // Konwersja czasu na godziny, minuty i sekundy
+        int hours = remainingTime / 3600;
+        int minutes = (remainingTime % 3600) / 60;
+        int seconds = remainingTime % 60;
+
+        std::cout << ", Pozostaly czas: ";
+        if (hours > 0) std::cout << hours << " h ";
+        if (hours > 0 || minutes > 0) std::cout << minutes << " min ";
+        std::cout << seconds << " s ";
     }
 
     std::cout.flush();
 }
+

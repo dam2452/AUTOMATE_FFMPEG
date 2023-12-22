@@ -41,11 +41,12 @@ std::string FFmpegCommandBuilder::buildCommand() {
     bool audioNeedConversion = false;
     for (const auto& stream : streams) {
         if (stream["codec_type"] == "audio" &&
-            !(stream["codec_name"] == "aac" || stream["codec_name"] == "eac3" || stream["codec_name"] == "dca")) {
+            !(stream["codec_name"] == "aac" || stream["codec_name"] == "eac3" || stream["codec_name"] == "dca" || stream["codec_name"] == "a52")) {
             audioNeedConversion = true;
             break;
         }
     }
+
 
 
     if (audioNeedConversion) {
