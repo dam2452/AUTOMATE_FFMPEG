@@ -17,25 +17,20 @@ void FileProcessor::processFiles(std::function<void(const std::string&, const st
         fs::recursive_directory_iterator{},
         [](const auto& entry) { return entry.is_regular_file(); });
     ProgressBar progressBar(totalFiles);
+    int currentFile = 0;
 
     for (const auto& entry : fs::recursive_directory_iterator(targetPath)) {
         if (entry.is_regular_file()) {
             fs::path outputPath = targetPath / entry.path().filename();
-            outputPath.replace_extension("_converted.mkv");
-
-            // Pomijanie jeœli plik ju¿ istnieje
-            if (!fs::exists(outputPath)) {
-                try {
-                    fileAction(entry.path().string(), targetDirectory);
-                }
-                catch (...) {
-                    // Obs³uga b³êdów, opcjonalnie usuñ niekompletny plik
-                    fs::remove(outputPath);
-                }
+            outputPath.replace_extension("_converted.mp4");
+            if (!fs::exists(outputPath)) {  // SprawdŸ, czy plik wyjœciowy ju¿ istnieje
+                fileAction(entry.path().string(), targetDirectory);
             }
-            progressBar.update(progressBar.getCurrent() + 1);
+
+            progressBar.update(++currentFile);  // Aktualizuj pasek postêpu
         }
     }
+
     progressBar.complete();
 }
 
