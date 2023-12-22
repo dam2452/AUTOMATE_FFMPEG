@@ -9,11 +9,8 @@ FileProcessor::FileProcessor(const std::string& sourceDir, const std::string& ta
     : sourceDirectory(sourceDir), targetDirectory(targetDir) {}
 
 void FileProcessor::processFiles(std::function<void(const std::string&, const std::string&)> fileAction) {
-    // Nie kopiujemy ju¿ katalogu, tylko przetwarzamy pliki bezpoœrednio
-
     fs::path sourcePath(sourceDirectory);
     fs::path targetPath(targetDirectory);
-    fs::create_directories(targetPath);  // Upewnij siê, ¿e katalog docelowy istnieje
 
     int totalFiles = std::count_if(fs::recursive_directory_iterator(sourcePath),
         fs::recursive_directory_iterator{},
@@ -23,8 +20,12 @@ void FileProcessor::processFiles(std::function<void(const std::string&, const st
 
     for (const auto& entry : fs::recursive_directory_iterator(sourcePath)) {
         if (entry.is_regular_file()) {
-            fs::path outputPath = targetPath / entry.path().filename();
-            //outputPath.replace_extension("_converted.mp4");
+            // Tworzymy œcie¿kê docelow¹ zachowuj¹c strukturê katalogów
+            fs::path relativePath = fs::relative(entry.path(), sourcePath);
+            fs::path outputPath = targetPath / relativePath;
+
+            // Tworzenie katalogów w œcie¿ce docelowej, jeœli nie istniej¹
+            fs::create_directories(outputPath.parent_path());
 
             if (!fs::exists(outputPath)) {
                 fileAction(entry.path().string(), outputPath.string());
@@ -37,6 +38,7 @@ void FileProcessor::processFiles(std::function<void(const std::string&, const st
 
     progressBar.complete();
 }
+
 
 
 void FileProcessor::copyDirectory(const fs::path& source, const fs::path& target) {
