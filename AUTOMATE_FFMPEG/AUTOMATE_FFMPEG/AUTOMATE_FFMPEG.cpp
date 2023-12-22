@@ -9,73 +9,154 @@
 #include <string>
 #include <algorithm>
 #include <filesystem>
+#define NOMINMAX
 #include <windows.h>
+#include <memory>
+#include <limits>
 
 //XD 
 #include "include\single_include\nlohmann\json.hpp"
 
+int maxResolution = 1080;
+int cqValue = 23;
+EncoderType encoderType = EncoderType::GPU;
+std::vector<int> selectedVideoStreams;
+std::vector<int> selectedAudioStreams;
+std::vector<int> selectedSubtitleStreams;
+std::string additionalFlags = "-loglevel quiet";
+std::string sourcePath;
+std::string destinationPath;
+
 void processVideoFile(const std::string& filePath, const std::string& outputDir) {
-   // std::cout << "filePath: " << filePath << std::endl;
 
-    int maxResolution = 1080; // Maksymalna rozdzielczoœæ
-    int cqValue = 23; // Wartoœæ CQ 
-    std::string additionalFlags = "-loglevel quiet"; // Dodatkowe flagi
-    std::vector<int> videoStreams = { 0 }; // Strumienie wideo
-    std::vector<int> audioStreams = {  }; // Strumienie audio
-    std::vector<int> subtitleStreams = {  }; // Strumienie napisów
-    EncoderType encoderType = EncoderType::GPU; // Wybór enkodera
-
-    FFmpegCommandBuilder builder(filePath, outputDir, maxResolution, cqValue, additionalFlags, videoStreams, audioStreams, subtitleStreams, encoderType,".mp4");
+    FFmpegCommandBuilder builder(filePath, outputDir, maxResolution, cqValue, additionalFlags, selectedVideoStreams, selectedAudioStreams, selectedSubtitleStreams, encoderType,".mp4");
     std::string command = builder.buildCommand();
 
-   // std::cout << "outputDir: " << outputDir << std::endl;
-    //std::cout << "Wygenerowane polecenie FFmpeg: " << command << std::endl;
+     //std::cout << "Wygenerowane polecenie FFmpeg: " << command << std::endl;
 
-    // Wykonanie polecenia FFmpeg
+     // Wykonanie polecenia FFmpeg
      Commands::execute(command,true);
+
 }
 
 
 
-
-void funkcja1() {
-    std::cout << "Funkcja 1 wywolana\n";
-
-
-
-
-    
+std::vector<int> parseStreamIndices(const std::string& input) {
+    std::vector<int> indices;
+    std::stringstream ss(input);
+    std::string item;
+    while (std::getline(ss, item, ',')) {
+        try {
+            indices.push_back(std::stoi(item));
+        }
+        catch (...) {
+            std::cout << "Nieprawidlowy indeks: " << item << std::endl;
+        }
+    }
+    return indices;
 }
 
-void funkcja2() {
-    std::cout << "Przetwarzenie rozpoczete:\n";
 
-    FileProcessor processor("TEST", "TEST1");
+
+void choosePaths() {
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignoruje wszystkie pozosta³oœci w buforze
+
+    std::cout << "Podaj sciezke zrodlowa: ";
+    std::getline(std::cin, sourcePath);
+
+    // Sprawdzanie, czy œcie¿ka Ÿród³owa nie jest pusta
+    if (sourcePath.empty()) {
+        std::cout << "Nie podano sciezki zrodlowej! Nacisnij Enter, aby kontynuowac..." << std::endl;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignorowanie bufora
+        return;
+    }
+
+    std::cout << "Podaj sciezke docelowa: ";
+    std::getline(std::cin, destinationPath);
+
+    // Sprawdzanie, czy œcie¿ka docelowa nie jest pusta
+    if (destinationPath.empty()) {
+        std::cout << "Nie podano sciezki docelowej! Nacisnij Enter, aby kontynuowac..." << std::endl;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignorowanie bufora
+        return;
+    }
+
+    std::cout << "Wybrano sciezke zrodlowa: " << sourcePath << std::endl;
+    std::cout << "Wybrano sciezke docelowa: " << destinationPath << std::endl;
+    std::cout << "Nacisnij Enter, aby kontynuowac..." << std::endl;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignorowanie bufora
+}
+
+void startProcessing() {
+    std::cout << "Rozpoczynam przetwarzanie plikow...\n";
+    FileProcessor processor(sourcePath, destinationPath);
     processor.processFiles(processVideoFile);
+    std::cout << "Przetwarzanie zakonczone.\n";
+}
+
+void selectVideoStreams() {
+    std::cout << "Wybierz strumienie wideo (indeksy oddzielone przecinkami): ";
+    // Usuniêcie pozosta³oœci w buforze wejœciowym
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::string input;
+    std::getline(std::cin, input);
+
+    selectedVideoStreams = parseStreamIndices(input);
+    std::cout << "Wybrane strumienie wideo: ";
+    for (int index : selectedVideoStreams) {
+        std::cout << index << " ";
+    }
+    std::cout << std::endl;
+}
 
 
+void selectAudioStreams() {
+    std::cout << "Wybierz strumienie audio (indeksy oddzielone przecinkami): ";
+
+    // Usuniêcie pozosta³oœci w buforze wejœciowym
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::string input;
+
+    std::getline(std::cin, input);
+
+    selectedAudioStreams = parseStreamIndices(input);
+    std::cout << "Wybrane strumienie audio: ";
+    for (int index : selectedAudioStreams) {
+        std::cout << index << " ";
+    }
+    std::cout << std::endl;
+}
+
+
+void selectSubtitleStreams() {
+    std::cout << "Wybierz strumienie napisów (indeksy oddzielone przecinkami): ";
+    // Usuniêcie pozosta³oœci w buforze wejœciowym
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::string input;
+    std::getline(std::cin, input);
+
+    selectedSubtitleStreams = parseStreamIndices(input);
+    std::cout << "Wybrane strumienie napisów: ";
+    for (int index : selectedSubtitleStreams) {
+        std::cout << index << " ";
+    }
+    std::cout << std::endl;
 }
 
 
 
 int main()
 {
-    funkcja2();
+    Menu menu;
 
+    menu.addItem("Rozpocznij przetwarzanie", startProcessing);
+    menu.addItem("Wybierz sciezki", choosePaths);
+    menu.addItem("Wybierz strumienie audio", selectAudioStreams);
+    menu.addItem("Wybierz strumienie napisow", selectSubtitleStreams);
+    menu.addItem("Wybierz strumienie wideo", selectVideoStreams);
 
-    //auto podMenu = std::make_shared<Menu>();
-    //podMenu->addItem("Podopcja 1", funkcja1);
-    //podMenu->addItem("Podopcja 2", funkcja2);
+    menu.run();
 
-    //Menu menu;
-    //menu.addItem("Opcja 1", funkcja1);
-    //menu.addSubMenu("Podmenu", podMenu);
-
-    //menu.run();
-
-
-
-
-	return 0;
+    return 0;
 }
 
