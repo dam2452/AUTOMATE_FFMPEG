@@ -40,6 +40,7 @@ private:
     std::string generateVideoFilter() const;
     std::string generateStreamSelectors();
     std::string generateEncoderOptions() const;
+    bool isCoverArt(const nlohmann::json& stream) const;
 };
 
 #endif // FFMPEGCOMMANDBUILDER_H

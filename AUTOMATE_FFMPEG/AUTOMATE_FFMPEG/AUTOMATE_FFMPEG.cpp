@@ -48,7 +48,7 @@ void funkcja1() {
 }
 
 void funkcja2() {
-    std::cout << "Przetwarzenie rozpoczete\n";
+    std::cout << "Przetwarzenie rozpoczete:\n";
 
     FileProcessor processor("TEST", "TEST1");
     processor.processFiles(processVideoFile);

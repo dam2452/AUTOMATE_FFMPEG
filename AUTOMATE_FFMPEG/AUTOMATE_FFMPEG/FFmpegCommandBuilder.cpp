@@ -77,9 +77,6 @@ std::string FFmpegCommandBuilder::buildCommand() {
 }
 
 std::string FFmpegCommandBuilder::createOutputFileName() const {
- //   fs::path inputPath(inputFilePath);
- //   std::string newFileName = inputPath.stem().string() + "_converted_CQ" + std::to_string(cqValue) + inputPath.extension().string();
-   // fs::path outputPath(outputDirectory);
 
     std::string outputDirectoryCopy = outputDirectory;
     if (outputDirectoryCopy.size() >= 4) {
@@ -100,6 +97,7 @@ std::string FFmpegCommandBuilder::generateVideoFilter() const {
 
 std::string FFmpegCommandBuilder::generateStreamSelectors() {
     std::ostringstream selectors;
+    std::string encoderOptions = generateEncoderOptions();
 
     // Video stream selectors
     if (videoStreams.empty()) {
@@ -144,4 +142,17 @@ std::string FFmpegCommandBuilder::generateEncoderOptions() const {
         // Mo¿esz dodaæ opcje wielow¹tkowoœci, np. threads=16, jeœli chcesz ograniczyæ liczbê w¹tków
     }
     return encoderOptions.str();
+}
+
+
+//TO DO
+bool FFmpegCommandBuilder::isCoverArt(const nlohmann::json& stream) const {
+    // SprawdŸ, czy strumieñ ma tylko jedn¹ klatkê (typowe dla ok³adek)
+    if (stream.contains("nb_frames") && stream["nb_frames"] == "1") {
+        return true;
+    }
+
+    // Dodatkowe warunki, np. sprawdzenie rozmiaru, metadanych itp.
+
+    return false;
 }
