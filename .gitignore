@@ -398,3 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 *.mp4
 *.avi
+AUTOMATE_FFMPEG/AUTOMATE_FFMPEG/ffprobe_output.json

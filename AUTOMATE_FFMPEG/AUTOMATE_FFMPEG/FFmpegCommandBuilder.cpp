@@ -41,11 +41,12 @@ std::string FFmpegCommandBuilder::buildCommand() {
     bool audioNeedConversion = false;
     for (const auto& stream : streams) {
         if (stream["codec_type"] == "audio" &&
-            !(stream["codec_name"] == "aac" || stream["codec_name"] == "eac3")) {
+            !(stream["codec_name"] == "aac" || stream["codec_name"] == "eac3" || stream["codec_name"] == "dca")) {
             audioNeedConversion = true;
             break;
         }
     }
+
 
     if (audioNeedConversion) {
         cmd << " -c:a aac";
@@ -101,7 +102,7 @@ std::string FFmpegCommandBuilder::generateStreamSelectors() {
 
     // Video stream selectors
     if (videoStreams.empty()) {
-        selectors << " -map 0:v";
+        selectors << " -map 0:v?";
     }
     else {
         for (int stream : videoStreams) {
@@ -111,7 +112,7 @@ std::string FFmpegCommandBuilder::generateStreamSelectors() {
 
     // Audio stream selectors
     if (audioStreams.empty()) {
-        selectors << " -map 0:a";
+        selectors << " -map 0:a?";
     }
     else {
         for (int stream : audioStreams) {
@@ -121,7 +122,7 @@ std::string FFmpegCommandBuilder::generateStreamSelectors() {
 
     // Subtitle stream selectors
     if (subtitleStreams.empty()) {
-        selectors << " -map 0:s";
+        selectors << " -map 0:s?";
     }
     else {
         for (int stream : subtitleStreams) {
