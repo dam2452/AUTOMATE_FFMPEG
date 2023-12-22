@@ -17,17 +17,20 @@ void FileProcessor::processFiles(std::function<void(const std::string&, const st
         fs::recursive_directory_iterator{},
         [](const auto& entry) { return entry.is_regular_file(); });
     ProgressBar progressBar(totalFiles);
-    int currentFile = 0;
-
+    //int currentFile = 0;
+    int processedFiles = 0;
     for (const auto& entry : fs::recursive_directory_iterator(targetPath)) {
         if (entry.is_regular_file()) {
             fs::path outputPath = targetPath / entry.path().filename();
             outputPath.replace_extension("_converted.mp4");
+
             if (!fs::exists(outputPath)) {  // SprawdŸ, czy plik wyjœciowy ju¿ istnieje
                 fileAction(entry.path().string(), targetDirectory);
+                processedFiles++;  // Zwiêksz licznik przetworzonych plików
             }
 
-            progressBar.update(++currentFile);  // Aktualizuj pasek postêpu
+            // Aktualizuj pasek postêpu na podstawie przetworzonych plików
+            progressBar.update(processedFiles);
         }
     }
 

@@ -18,17 +18,16 @@ void ProgressBar::complete() {
 void ProgressBar::display() const {
     int percent = int(float(current) / total * 100.0);
 
-    std::cout << "Postep: " << percent << " %";
+    std::cout << "\rPostep: " << percent << " %";  // U¿ywamy '\r' do powrotu kursora
 
-    if (current > 0) {
+    if (current > 0 && current < total) {
         auto now = std::chrono::steady_clock::now();
         auto timeElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
         auto estimatedTotalTime = static_cast<long long>(timeElapsed) * total / current;
         auto remainingTime = estimatedTotalTime - timeElapsed;
 
-        std::cout << ", Pozostaly czas: " << remainingTime << " s";
+        std::cout << ", Pozostaly czas: " << remainingTime << " s ";
     }
 
-    std::cout << "\r";
     std::cout.flush();
 }
