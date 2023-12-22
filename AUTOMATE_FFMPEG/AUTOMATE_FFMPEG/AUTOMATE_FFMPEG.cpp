@@ -18,7 +18,7 @@
 #include "include\single_include\nlohmann\json.hpp"
 
 int maxResolution = 1080;
-int cqValue = 23;
+int cqValue = 28;
 EncoderType encoderType = EncoderType::GPU;
 std::vector<int> selectedVideoStreams;
 std::vector<int> selectedAudioStreams;
@@ -143,6 +143,34 @@ void selectSubtitleStreams() {
     std::cout << std::endl;
 }
 
+void selectCQ() {
+    std::cout << "Wybierz CQ: ";
+
+    // Usuniêcie pozosta³oœci w buforze wejœciowym
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::string input;
+
+    std::getline(std::cin, input);
+
+    cqValue = std::stoi(input);
+    std::cout << "Wybrane CQ: "<< cqValue;
+    std::cout << std::endl;
+}
+
+void selectResLimit() {
+    std::cout << "Wybierz limit rozdzielczosci: ";
+
+    // Usuniêcie pozosta³oœci w buforze wejœciowym
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::string input;
+
+    std::getline(std::cin, input);
+
+    maxResolution = std::stoi(input);
+    std::cout << "Wybrany limit rozdzielczosci: " << maxResolution;
+    std::cout << std::endl;
+}
+
 
 
 int main()
@@ -154,6 +182,8 @@ int main()
     menu.addItem("Wybierz strumienie audio", selectAudioStreams);
     menu.addItem("Wybierz strumienie napisow", selectSubtitleStreams);
     menu.addItem("Wybierz strumienie wideo", selectVideoStreams);
+    menu.addItem("Wybierz CQ", selectCQ);
+    menu.addItem("Wybierz limit rozdzielczosci", selectResLimit);
 
     menu.run();
 
