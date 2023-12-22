@@ -20,7 +20,7 @@ void processVideoFile(const std::string& filePath, const std::string& outputDir)
 
     // Przyk³adowe parametry dla FFmpegCommandBuilder
     int maxResolution = 1080; // Maksymalna rozdzielczoœæ
-    int cqValue = 23; // Wartoœæ CQ dla NVENC
+    int cqValue = 23; // Wartoœæ CQ 
     std::string additionalFlags = ""; // Dodatkowe flagi, jeœli s¹ potrzebne
     std::vector<int> videoStreams = { 0 }; // Przyk³adowe strumienie wideo
     std::vector<int> audioStreams = { 0 }; // Przyk³adowe strumienie audio
@@ -32,6 +32,9 @@ void processVideoFile(const std::string& filePath, const std::string& outputDir)
         additionalFlags, videoStreams, audioStreams, subtitleStreams, encoderType);
     std::string command = builder.buildCommand();
 
+    // Wykonanie polecenia FFmpeg
+    Commands::execute(command);
+
    // std::cout << "Wygenerowane polecenie FFmpeg: " << command << std::endl;
 
 }
@@ -40,13 +43,10 @@ void processVideoFile(const std::string& filePath, const std::string& outputDir)
 
 void funkcja1() {
     std::cout << "Funkcja 1 wywolana\n";
-    std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
 
 
- // FFProbe probe("TEST\Nowy folder\input4.mp4");
-  FFProbe probe("\".\\TEST\\Nowy folder\\input4.mp4\"");  
-  probe.analyze();
-  probe.displayStreams();
+
+
     
 }
 
@@ -57,19 +57,12 @@ void funkcja2() {
     processor.processFiles(processVideoFile);
 
 
-
-   // std::cout << Commands::execute("dir");
-
- 
-
-
 }
 
 
 
 int main()
 {
-
 
 
 
