@@ -24,8 +24,8 @@ std::vector<int> selectedVideoStreams;
 std::vector<int> selectedAudioStreams;
 std::vector<int> selectedSubtitleStreams;
 std::string additionalFlags = "-loglevel quiet";  //DEBUG: -loglevel debug 
-std::string sourcePath;
-std::string destinationPath;
+std::string sourcePath="XYZ";
+std::string destinationPath="XYZOUT";
 
 void processVideoFile(const std::string& filePath, const std::string& outputDir) {
 
