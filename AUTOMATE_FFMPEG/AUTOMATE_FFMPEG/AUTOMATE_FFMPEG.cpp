@@ -129,7 +129,7 @@ void selectAudioStreams() {
 
 
 void selectSubtitleStreams() {
-    std::cout << "Wybierz strumienie napisów (indeksy oddzielone przecinkami): ";
+    std::cout << "Wybierz strumienie napisow (indeksy oddzielone przecinkami): ";
     // Usuniêcie pozosta³oœci w buforze wejœciowym
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::string input;
