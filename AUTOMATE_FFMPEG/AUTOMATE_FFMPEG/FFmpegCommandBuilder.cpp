@@ -137,7 +137,7 @@ std::string FFmpegCommandBuilder::generateStreamSelectors() {
 std::string FFmpegCommandBuilder::generateEncoderOptions() const {
     std::ostringstream encoderOptions;
     if (encoderType == EncoderType::GPU) {
-        encoderOptions << " -hwaccel cuda -c:v hevc_nvenc -preset slow -rc vbr_hq";
+        encoderOptions << " -c:v hevc_nvenc -preset slow"; //-hwaccel cuda  -rc vbr_hq
     }
     else if (encoderType == EncoderType::CPU) {
         encoderOptions << " -c:v libx265 -cpu-used 4 -threads 16 -tile-columns 2 -tile-rows 1 -row-mt 1 -speed 2 -auto-alt-ref 1 -lag-in-frames 25";
