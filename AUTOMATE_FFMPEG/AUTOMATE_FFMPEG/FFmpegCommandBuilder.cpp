@@ -63,8 +63,17 @@ std::string FFmpegCommandBuilder::buildCommand() {
         cmd << " -vf \"" << vf << "\"";
     }
 
+    bool hasSubripSubtitle = std::any_of(streams.begin(), streams.end(), [this](const nlohmann::json& stream) {
+        return stream["codec_type"] == "subtitle" && isSubripSubtitle(stream);
+        });
+
     // Subtitles processing
-    cmd << " -c:s copy";
+    if (hasSubripSubtitle) {
+        cmd << " -c:s mov_text";
+    }
+    else {
+        cmd << " -c:s copy";
+    };
 
     // Additional flags
     if (!additionalFlags.empty()) {
@@ -107,7 +116,7 @@ std::string FFmpegCommandBuilder::generateStreamSelectors() {
     }
     else {
         for (int stream : videoStreams) {
-            selectors << " -map 0:v:" << stream;
+            selectors << " -map 0:v:" << "?" << stream;
         }
     }
 
@@ -117,17 +126,17 @@ std::string FFmpegCommandBuilder::generateStreamSelectors() {
     }
     else {
         for (int stream : audioStreams) {
-            selectors << " -map 0:a:" << stream;
+            selectors << " -map 0:a:" << "?" << stream;
         }
     }
-
+    
     // Subtitle stream selectors
     if (subtitleStreams.empty()) {
         selectors << " -map 0:s?";
     }
     else {
         for (int stream : subtitleStreams) {
-            selectors << " -map 0:s:" << stream;
+            selectors << " -map 0:s:" << "?" << stream;
         }
     }
 
@@ -157,4 +166,8 @@ bool FFmpegCommandBuilder::isCoverArt(const nlohmann::json& stream) const {
     // Dodatkowe warunki, np. sprawdzenie rozmiaru, metadanych itp.
 
     return false;
+}
+
+bool FFmpegCommandBuilder::isSubripSubtitle(const nlohmann::json& stream) const {
+    return stream["codec_name"] == "subrip";
 }

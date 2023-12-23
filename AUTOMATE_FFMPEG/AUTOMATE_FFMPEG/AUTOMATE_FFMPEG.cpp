@@ -23,7 +23,7 @@ EncoderType encoderType = EncoderType::GPU;
 std::vector<int> selectedVideoStreams;
 std::vector<int> selectedAudioStreams;
 std::vector<int> selectedSubtitleStreams;
-std::string additionalFlags = "-loglevel quiet";  //DEBUG: -loglevel debug 
+std::string additionalFlags = "-loglevel quiet";  //DEBUG: -loglevel quiet 
 std::string sourcePath="XYZ";
 std::string destinationPath="XYZOUT";
 
