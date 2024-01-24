@@ -9,7 +9,7 @@
 class FFProbe {
 public:
     FFProbe(const std::string& filePath);
-    void analyze();
+    bool analyze();
     void displayStreams();
     nlohmann::json getStreams() const;
 
