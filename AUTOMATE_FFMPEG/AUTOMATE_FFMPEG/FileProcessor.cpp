@@ -8,11 +8,11 @@ namespace fs = std::filesystem;
 FileProcessor::FileProcessor(const std::string& sourceDir, const std::string& targetDir)
     : sourceDirectory(sourceDir), targetDirectory(targetDir) {}
 
-void FileProcessor::processFiles(std::function<void(const std::string&, const std::string&)> fileAction) {
+void FileProcessor::processFiles(VideoProcessor& processor, std::function<void(VideoProcessor&, const std::string&, const std::string&)> fileAction) {
     fs::path sourcePath(sourceDirectory);
     fs::path targetPath(targetDirectory);
 
-    // Checking if the source folder exists
+    // Check if the source folder exists
     if (!fs::exists(sourcePath) || !fs::is_directory(sourcePath)) {
         std::cerr << "The source folder does not exist or is invalid: " << sourceDirectory << std::endl;
         return; // Terminate the function if the source folder does not exist
@@ -32,7 +32,7 @@ void FileProcessor::processFiles(std::function<void(const std::string&, const st
             fs::create_directories(outputPath.parent_path());
 
             if (!fs::exists(outputPath)) {
-                fileAction(entry.path().string(), outputPath.string());
+                fileAction(processor, entry.path().string(), outputPath.string());
                 processedFiles++;
             }
 

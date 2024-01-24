@@ -4,14 +4,15 @@
 #include <string>
 #include <functional>
 #include <filesystem>
+#include "VideoProcessor.h"
 
 namespace fs = std::filesystem;
 
 class FileProcessor {
 public:
     FileProcessor(const std::string& sourceDir, const std::string& targetDir);
-   // void processFiles(std::function<void(const std::string&, const std::string&)> fileAction);
-    void processFiles(std::function<void(const std::string&, const std::string&)> fileAction);
+    void processFiles(VideoProcessor& processor, std::function<void(VideoProcessor&, const std::string&, const std::string&)> fileAction);
+
 private:
     std::string sourceDirectory;
     std::string targetDirectory;

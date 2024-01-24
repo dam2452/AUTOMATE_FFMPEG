@@ -129,20 +129,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AUTOMATE_FFMPEG.cpp" />
-    <ClCompile Include="commands.cpp" />
+    <ClCompile Include="Commands.cpp" />
     <ClCompile Include="FFmpegCommandBuilder.cpp" />
     <ClCompile Include="FFProbe.cpp" />
     <ClCompile Include="FileProcessor.cpp" />
-    <ClCompile Include="menu.cpp" />
+    <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="MenuInitializer.cpp" />
     <ClCompile Include="ProgressBar.cpp" />
+    <ClCompile Include="VideoProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="commands.h" />
+    <ClInclude Include="Commands.h" />
     <ClInclude Include="FFmpegCommandBuilder.h" />
     <ClInclude Include="FFProbe.h" />
     <ClInclude Include="FileProcessor.h" />
-    <ClInclude Include="menu.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="MenuInitializer.h" />
     <ClInclude Include="ProgressBar.h" />
+    <ClInclude Include="VideoProcessor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

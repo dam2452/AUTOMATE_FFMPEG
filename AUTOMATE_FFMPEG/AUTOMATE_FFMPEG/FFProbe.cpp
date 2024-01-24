@@ -4,9 +4,6 @@
 #include <fstream>
 #include <cstdlib>
 
-//XD 
-#include "include\single_include\nlohmann\json.hpp"
-
 using json = nlohmann::json;
 
 FFProbe::FFProbe(const std::string& filePath) : filePath(filePath) {}
@@ -41,7 +38,7 @@ void FFProbe::displayStreams() {
                 std::cout << "Subtitle format: " << stream["codec_name"] << std::endl;
             }
 
-            std::cout << std::endl; // Oddziela informacje o poszczególnych strumieniach
+            std::cout << std::endl; // Separates information about individual streams
         }
     }
 }
@@ -51,6 +48,6 @@ nlohmann::json FFProbe::getStreams() const {
         return jsonData["streams"];
     }
     else {
-        return nlohmann::json::array(); // Pusty JSON Array, jeœli nie ma strumieni
+        return nlohmann::json::array(); // Empty JSON Array if there are no streams
     }
 }
