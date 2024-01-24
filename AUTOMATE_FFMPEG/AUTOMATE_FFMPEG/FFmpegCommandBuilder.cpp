@@ -3,6 +3,8 @@
 #include <sstream>
 #include <filesystem>
 #include <string>
+#include <set>
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -25,17 +27,79 @@ bool FFmpegCommandBuilder::checkAudioCodec(const nlohmann::json& stream) const {
     const std::string codec = stream["codec_name"];
     return (codec == "aac" || codec == "eac3");
 }
+bool FFmpegCommandBuilder::isPGSSubtitle(const nlohmann::json& stream) const {
+    return stream["codec_name"] == "hdmv_pgs_subtitle";
+}
+
+
+std::string FFmpegCommandBuilder::createOutputFileName() const {
+
+    std::string outputDirectoryCopy = outputDirectory;
+    if (outputDirectoryCopy.size() >= 4) {
+        outputDirectoryCopy.erase(outputDirectoryCopy.size() - 4);  // Usuwa ostatnie trzy znaki
+    }
+
+    return outputDirectoryCopy + "_CQ" + std::to_string(cqValue) + extension;
+}
+
+
+bool FFmpegCommandBuilder::isStreamSelected(int streamIndex) {
+    return std::find(subtitleStreams.begin(), subtitleStreams.end(), streamIndex) != subtitleStreams.end();
+}
+
+bool FFmpegCommandBuilder::isCompatibleSubtitle(const nlohmann::json& stream) {
+    static const std::set<std::string> compatibleSubtitles = { "mov_text" };
+    return compatibleSubtitles.find(stream["codec_name"].get<std::string>()) != compatibleSubtitles.end();
+}
+
+void FFmpegCommandBuilder::appendSubtitleProcessing(std::ostringstream& cmd, const std::vector<nlohmann::json>& streams) {
+
+    cmd << " -map 0:s:?" << " -c:s mov_text";
+
+    //CHUJOWO DZIALA
+    // 
+    //for (const auto& stream : streams) {
+    //    if (stream["codec_type"] == "subtitle" ){
+    //        int streamIndex = stream["index"];
+    //     
+
+    //            // Konwersja napisów SubRip (srt) na mov_text dla formatu MP4
+    //            if (stream["codec_name"] == "subrip") {
+    //                
+
+
+    //                    cmd << " -map 0:s:?" << streamIndex << " -c:s mov_text";
+    //            }
+    //            else if (isCompatibleSubtitle(stream)) {
+    //                // Kopiowanie napisów kompatybilnych z MP4
+    //                cmd << " -map 0:s:?" << streamIndex << " -c:s copy";
+    //            }
+    //    }
+    //}
+}
+    
+
+
+
+
+
+bool FFmpegCommandBuilder::isCompatibleSubtitle(const nlohmann::json& stream) const {
+    static const std::set<std::string> compatibleSubtitles = { "mov_text" };
+    return compatibleSubtitles.find(stream["codec_name"].get<std::string>()) != compatibleSubtitles.end();
+}
+
+
+
 
 std::string FFmpegCommandBuilder::buildCommand() {
-
     ffprobe.analyze();
     auto streams = ffprobe.getStreams();
 
     std::ostringstream cmd;
     cmd << "ffmpeg -i \"" << inputFilePath << "\"";
 
-    // Stream selectors
-    cmd << generateStreamSelectors();
+    // Dodanie selektorów strumieni dla wideo i audio
+    cmd << generateStreamSelectors(videoStreams, audioStreams);
 
     // Audio processing
     bool audioNeedConversion = false;
@@ -47,8 +111,6 @@ std::string FFmpegCommandBuilder::buildCommand() {
         }
     }
 
-
-
     if (audioNeedConversion) {
         cmd << " -c:a aac";
     }
@@ -58,22 +120,13 @@ std::string FFmpegCommandBuilder::buildCommand() {
 
     // Video processing
     cmd << generateEncoderOptions();
-    std::string vf = generateVideoFilter();
-    if (!vf.empty()) {
-        cmd << " -vf \"" << vf << "\"";
-    }
-
-    bool hasSubripSubtitle = std::any_of(streams.begin(), streams.end(), [this](const nlohmann::json& stream) {
-        return stream["codec_type"] == "subtitle" && isSubripSubtitle(stream);
-        });
+//    std::string vf = generateVideoFilter();
+//    if (!vf.empty()) {
+//        cmd << " -vf \"" << vf << "\"";
+//    }
 
     // Subtitles processing
-    if (hasSubripSubtitle) {
-        cmd << " -c:s mov_text";
-    }
-    else {
-        cmd << " -c:s copy";
-    };
+    appendSubtitleProcessing(cmd, streams);
 
     // Additional flags
     if (!additionalFlags.empty()) {
@@ -87,16 +140,6 @@ std::string FFmpegCommandBuilder::buildCommand() {
     return cmd.str();
 }
 
-std::string FFmpegCommandBuilder::createOutputFileName() const {
-
-    std::string outputDirectoryCopy = outputDirectory;
-    if (outputDirectoryCopy.size() >= 4) {
-        outputDirectoryCopy.erase(outputDirectoryCopy.size() - 4);  // Usuwa ostatnie trzy znaki
-    }
-
-    return outputDirectoryCopy + "_CQ" + std::to_string(cqValue) + extension;
-}
-
 
 
 std::string FFmpegCommandBuilder::generateVideoFilter() const {
@@ -106,9 +149,8 @@ std::string FFmpegCommandBuilder::generateVideoFilter() const {
     return "";
 }
 
-std::string FFmpegCommandBuilder::generateStreamSelectors() {
+std::string FFmpegCommandBuilder::generateStreamSelectors(const std::vector<int>& videoStreams, const std::vector<int>& audioStreams) {
     std::ostringstream selectors;
-    std::string encoderOptions = generateEncoderOptions();
 
     // Video stream selectors
     if (videoStreams.empty()) {
@@ -116,7 +158,7 @@ std::string FFmpegCommandBuilder::generateStreamSelectors() {
     }
     else {
         for (int stream : videoStreams) {
-            selectors << " -map 0:v:" << "?" << stream;
+            selectors << " -map 0:v:" << stream;
         }
     }
 
@@ -126,22 +168,24 @@ std::string FFmpegCommandBuilder::generateStreamSelectors() {
     }
     else {
         for (int stream : audioStreams) {
-            selectors << " -map 0:a:" << "?" << stream;
-        }
-    }
-    
-    // Subtitle stream selectors
-    if (subtitleStreams.empty()) {
-        selectors << " -map 0:s?";
-    }
-    else {
-        for (int stream : subtitleStreams) {
-            selectors << " -map 0:s:" << "?" << stream;
+            selectors << " -map 0:a:" << stream;
         }
     }
 
+
+    // Subtitle stream selectors
+    //if (subtitleStreams.empty()) {
+    //    selectors << " -map 0:s?";
+    //}
+    //else {
+    //    for (int stream : subtitleStreams) {
+    //        selectors << " -map 0:" << stream;
+    //    }
+    //}
+
     return selectors.str();
 }
+
 
 std::string FFmpegCommandBuilder::generateEncoderOptions() const {
     std::ostringstream encoderOptions;

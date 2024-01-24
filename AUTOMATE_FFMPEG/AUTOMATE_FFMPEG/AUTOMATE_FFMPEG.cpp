@@ -23,20 +23,19 @@ EncoderType encoderType = EncoderType::GPU;
 std::vector<int> selectedVideoStreams;
 std::vector<int> selectedAudioStreams;
 std::vector<int> selectedSubtitleStreams;
-std::string additionalFlags = "-loglevel quiet";  //DEBUG: -loglevel quiet 
+std::string additionalFlags = "";  //DEBUG: -loglevel quiet   -b:v 1M -maxrate 1.2M -bufsize 2M
 std::string sourcePath="XYZ";
 std::string destinationPath="XYZOUT";
 
 void processVideoFile(const std::string& filePath, const std::string& outputDir) {
 
-    FFmpegCommandBuilder builder(filePath, outputDir, maxResolution, cqValue, additionalFlags, selectedVideoStreams, selectedAudioStreams, selectedSubtitleStreams, encoderType,".mp4");
+    FFmpegCommandBuilder builder(filePath, outputDir, maxResolution, cqValue, additionalFlags, selectedVideoStreams, selectedAudioStreams, selectedSubtitleStreams, encoderType, ".mp4");
     std::string command = builder.buildCommand();
 
-     //std::cout << "Wygenerowane polecenie FFmpeg: " << command << std::endl;
+    std::cout << "Generated FFmpeg command: " << command << std::endl;
 
-     // Wykonanie polecenia FFmpeg
-     Commands::execute(command,true);
-
+    // Execute FFmpeg command
+    Commands::execute(command, true);
 }
 
 
@@ -50,7 +49,7 @@ std::vector<int> parseStreamIndices(const std::string& input) {
             indices.push_back(std::stoi(item));
         }
         catch (...) {
-            std::cout << "Nieprawidlowy indeks: " << item << std::endl;
+            std::cout << "Invalid index: " << item << std::endl;
         }
     }
     return indices;
@@ -59,159 +58,273 @@ std::vector<int> parseStreamIndices(const std::string& input) {
 
 
 void choosePaths() {
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignoruje wszystkie pozosta³oœci w buforze
 
-    std::cout << "Podaj sciezke zrodlowa: ";
+    std::cout << "Enter source path: ";
     std::getline(std::cin, sourcePath);
 
-    // Sprawdzanie, czy œcie¿ka Ÿród³owa nie jest pusta
+    // Checking if the source path is empty
     if (sourcePath.empty()) {
-        std::cout << "Nie podano sciezki zrodlowej! Nacisnij Enter, aby kontynuowac..." << std::endl;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignorowanie bufora
+        std::cout << "No source path provided! Press Enter to continue..." << std::endl;
         return;
     }
 
-    std::cout << "Podaj sciezke docelowa: ";
+    std::cout << "Enter destination path: ";
     std::getline(std::cin, destinationPath);
 
-    // Sprawdzanie, czy œcie¿ka docelowa nie jest pusta
+    // Checking if the destination path is empty
     if (destinationPath.empty()) {
-        std::cout << "Nie podano sciezki docelowej! Nacisnij Enter, aby kontynuowac..." << std::endl;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignorowanie bufora
+        std::cout << "No destination path provided! Press Enter to continue..." << std::endl;
         return;
     }
 
-    std::cout << "Wybrano sciezke zrodlowa: " << sourcePath << std::endl;
-    std::cout << "Wybrano sciezke docelowa: " << destinationPath << std::endl;
-    std::cout << "Nacisnij Enter, aby kontynuowac..." << std::endl;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignorowanie bufora
+    std::cout << "Selected source path: " << sourcePath << std::endl;
+    std::cout << "Selected destination path: " << destinationPath << std::endl;
 }
 
+
 void startProcessing() {
-    std::cout << "Rozpoczynam przetwarzanie plikow...\n";
+    std::cout << "Starting file processing...\n";
     FileProcessor processor(sourcePath, destinationPath);
     processor.processFiles(processVideoFile);
-    std::cout << "Przetwarzanie zakonczone.\n";
+    std::cout << "Processing completed.\n";
 }
 
 void selectVideoStreams() {
-    std::cout << "Wybierz strumienie wideo (indeksy oddzielone przecinkami): ";
-    // Usuniêcie pozosta³oœci w buforze wejœciowym
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Select video streams (default: ALL) (indices separated by commas): ";
     std::string input;
     std::getline(std::cin, input);
 
-    selectedVideoStreams = parseStreamIndices(input);
-    std::cout << "Wybrane strumienie wideo: ";
-    for (int index : selectedVideoStreams) {
-        std::cout << index << " ";
+    // If input is empty, select all streams
+    if (input.empty()) {
+        std::cout << "Selected video streams: ALL" << std::endl;
+        return;
     }
-    std::cout << std::endl;
-}
 
+    std::istringstream iss(input);
+    std::string token;
+    std::vector<int> validIndices;
+    bool invalidInput = false;
+
+    // Parsing the indices
+    while (std::getline(iss, token, ',')) {
+        try {
+            int index = std::stoi(token);
+            validIndices.push_back(index);
+        }
+        catch (...) {
+            // In case of invalid input (non-integer values)
+            std::cerr << "Invalid input: " << token << ". Please enter valid indices." << std::endl;
+            invalidInput = true;
+            break;
+        }
+    }
+
+    if (!invalidInput) {
+        selectedVideoStreams = validIndices;
+        std::cout << "Selected video streams: ";
+        for (int index : selectedVideoStreams) {
+            std::cout << index << " ";
+        }
+        std::cout << std::endl;
+    }
+}
 
 void selectAudioStreams() {
-    std::cout << "Wybierz strumienie audio (indeksy oddzielone przecinkami): ";
-
-    // Usuniêcie pozosta³oœci w buforze wejœciowym
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Select audio streams (default: ALL) (indices separated by commas): ";
     std::string input;
-
     std::getline(std::cin, input);
 
-    selectedAudioStreams = parseStreamIndices(input);
-    std::cout << "Wybrane strumienie audio: ";
-    for (int index : selectedAudioStreams) {
-        std::cout << index << " ";
+    // If input is empty, select all streams
+    if (input.empty()) {
+        std::cout << "Selected audio streams: ALL" << std::endl;
+        return;
     }
-    std::cout << std::endl;
+
+    std::istringstream iss(input);
+    std::string token;
+    std::vector<int> validIndices;
+    bool invalidInput = false;
+
+    // Parsing the indices
+    while (std::getline(iss, token, ',')) {
+        try {
+            int index = std::stoi(token);
+            validIndices.push_back(index);
+        }
+        catch (...) {
+            // In case of invalid input (non-integer values)
+            std::cerr << "Invalid input: " << token << ". Please enter valid indices." << std::endl;
+            invalidInput = true;
+            break;
+        }
+    }
+
+    if (!invalidInput) {
+        selectedAudioStreams = validIndices;
+        std::cout << "Selected audio streams: ";
+        for (int index : selectedAudioStreams) {
+            std::cout << index << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
-
 void selectSubtitleStreams() {
-    std::cout << "Wybierz strumienie napisow (indeksy oddzielone przecinkami): ";
-    // Usuniêcie pozosta³oœci w buforze wejœciowym
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Select subtitle streams (default: ALL) (indices separated by commas): ";
     std::string input;
     std::getline(std::cin, input);
 
-    selectedSubtitleStreams = parseStreamIndices(input);
-    std::cout << "Wybrane strumienie napisów: ";
-    for (int index : selectedSubtitleStreams) {
-        std::cout << index << " ";
+    // If input is empty, select all streams
+    if (input.empty()) {
+        std::cout << "Selected subtitle streams: ALL" << std::endl;
+        return;
     }
-    std::cout << std::endl;
+
+    std::istringstream iss(input);
+    std::string token;
+    std::vector<int> validIndices;
+    bool invalidInput = false;
+
+    // Parsing the indices
+    while (std::getline(iss, token, ',')) {
+        try {
+            int index = std::stoi(token);
+            validIndices.push_back(index);
+        }
+        catch (...) {
+            // In case of invalid input (non-integer values)
+            std::cerr << "Invalid input: " << token << ". Please enter valid indices." << std::endl;
+            invalidInput = true;
+            break;
+        }
+    }
+
+    if (!invalidInput) {
+        selectedSubtitleStreams = validIndices;
+        std::cout << "Selected subtitle streams: ";
+        for (int index : selectedSubtitleStreams) {
+            std::cout << index << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 void selectCQ() {
-    std::cout << "Wybierz CQ: ";
+    std::cout << "Select CQ (default: 28): ";
 
-    // Usuniêcie pozosta³oœci w buforze wejœciowym
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    if (std::cin.peek() == '\n') {
+        std::cin.ignore();
+    }
+
     std::string input;
-
     std::getline(std::cin, input);
 
-    cqValue = std::stoi(input);
-    std::cout << "Wybrane CQ: "<< cqValue;
-    std::cout << std::endl;
+    try {
+        if (!input.empty()) {
+            cqValue = std::stoi(input);
+        }
+        else {
+            cqValue = 28; // Default value
+        }
+        std::cout << "Selected CQ: " << cqValue << std::endl;
+    }
+    catch (const std::invalid_argument& e) {
+        // If the string cannot be converted to an integer
+        std::cerr << "Invalid input. Please enter a valid number." << std::endl;
+        cqValue = 28; // Default value
+    }
+    catch (const std::out_of_range& e) {
+        // If the number is too large
+        std::cerr << "Number is out of range. Please enter a smaller number." << std::endl;
+        cqValue = 28; // Default value
+    }
 }
 
 void selectResLimit() {
-    std::cout << "Wybierz limit rozdzielczosci: ";
+    std::cout << "Select resolution limit (default: 1080): ";
 
-    // Usuniêcie pozosta³oœci w buforze wejœciowym
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::string input;
+    std::getline(std::cin, input);
+
+    try {
+        maxResolution = std::stoi(input);
+        std::cout << "Selected resolution limit: " << maxResolution << std::endl;
+    }
+    catch (const std::invalid_argument& e) {
+        std::cerr << "Invalid input. Please enter a number." << std::endl;
+        maxResolution = 1080;
+    }
+    catch (const std::out_of_range& e) {
+        std::cerr << "Number is out of range. Please enter a smaller number." << std::endl;
+        maxResolution = 1080;
+    }
+}
+
+
+void chooseEncoderType() {
+    std::cout << "Choose encoder type (default: GPU) : ";
+
     std::string input;
 
     std::getline(std::cin, input);
 
-    maxResolution = std::stoi(input);
-    std::cout << "Wybrany limit rozdzielczosci: " << maxResolution;
+    if (input == "CPU") {
+        encoderType = EncoderType::CPU;
+    }
+    else if (input == "GPU") {
+        encoderType = EncoderType::GPU;
+    }
+    else {
+        std::cout << "Invalid encoder type! Press Enter to continue..." << std::endl;
+        return;
+    }
+    std::cout << "Selected encoder type: " << input;
     std::cout << std::endl;
 }
-
-void chooseEncoderType() {
-	std::cout << "Wybierz typ enkodera: ";
-
-	// Usuniêcie pozosta³oœci w buforze wejœciowym
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	std::string input;
-
-	std::getline(std::cin, input);
-
-    if (input == "CPU") {
-		encoderType = EncoderType::CPU;
+//show settings
+void showSettings() {
+    std::cout << std::endl;
+	std::cout << "Selected source path: " << sourcePath << std::endl;
+	std::cout << "Selected destination path: " << destinationPath << std::endl;
+	std::cout << "Selected video streams (Nothing = ALL): ";
+    for (int index : selectedVideoStreams) {
+		std::cout << index << " ";
 	}
-    else if (input == "GPU") {
-		encoderType = EncoderType::GPU;
-	}
-    else {
-		std::cout << "Nieprawidlowy typ enkodera! Nacisnij Enter, aby kontynuowac..." << std::endl;
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignorowanie bufora
-		return;
-	}
-	std::cout << "Wybrany typ enkodera: " << input;
 	std::cout << std::endl;
+	std::cout << "Selected audio streams (Nothing = ALL): ";
+    for (int index : selectedAudioStreams) {
+		std::cout << index << " ";
+	}
+	std::cout << std::endl;
+	std::cout << "Selected subtitle streams (Nothing = ALL): ";
+    for (int index : selectedSubtitleStreams) {
+		std::cout << index << " ";
+	}
+	std::cout << std::endl;
+	std::cout << "Selected CQ: " << cqValue << std::endl;
+	std::cout << "Selected resolution limit: " << maxResolution << std::endl;
+	std::cout << "Selected encoder type (0 = CPU , 1 = GPU): " << static_cast<int>(encoderType) << std::endl;
+	std::cout << "Selected additional flags: " << additionalFlags << std::endl;
+    std::cout << std::endl;
 }
-
 
 
 int main()
 {
-    Menu menu;
+    Menu menu("AUTOMATE_FFMPEG");
 
-    menu.addItem("Rozpocznij przetwarzanie", startProcessing);
-    menu.addItem("Wybierz sciezki", choosePaths);
-    menu.addItem("Wybierz strumienie audio", selectAudioStreams);
-    menu.addItem("Wybierz strumienie napisow", selectSubtitleStreams);
-    menu.addItem("Wybierz strumienie wideo", selectVideoStreams);
-    menu.addItem("Wybierz CQ", selectCQ);
-    menu.addItem("Wybierz limit rozdzielczosci", selectResLimit);
-    menu.addItem("Wybierz typ enkodera", chooseEncoderType);
+    menu.addItem("Start processing", startProcessing);
+    menu.addItem("Choose paths", choosePaths);
+    menu.addItem("Select audio streams", selectAudioStreams);
+    menu.addItem("Select subtitle streams", selectSubtitleStreams);
+    menu.addItem("Select video streams", selectVideoStreams);
+    menu.addItem("Select CQ", selectCQ);
+    menu.addItem("Select resolution limit", selectResLimit);
+    menu.addItem("Choose encoder type", chooseEncoderType);
+    menu.addItem("Check settings", showSettings);
+
 
     menu.run();
 
     return 0;
 }
-

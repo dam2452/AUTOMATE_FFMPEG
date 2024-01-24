@@ -36,9 +36,14 @@ private:
 
 
     bool checkAudioCodec(const nlohmann::json& stream) const;
+    bool isPGSSubtitle(const nlohmann::json& stream) const;
     std::string createOutputFileName() const;
+    bool isStreamSelected(int streamIndex);
+    bool isCompatibleSubtitle(const nlohmann::json& stream);
+    void appendSubtitleProcessing(std::ostringstream& cmd, const std::vector<nlohmann::json>& streams);
+    bool isCompatibleSubtitle(const nlohmann::json& stream) const;
     std::string generateVideoFilter() const;
-    std::string generateStreamSelectors();
+    std::string generateStreamSelectors(const std::vector<int>& videoStreams, const std::vector<int>& audioStreams);
     std::string generateEncoderOptions() const;
     bool isCoverArt(const nlohmann::json& stream) const;
     bool isSubripSubtitle(const nlohmann::json& stream) const;

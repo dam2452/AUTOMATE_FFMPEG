@@ -4,7 +4,7 @@
 #include <memory>
 
 #ifdef _WIN32
-// Implementacja dla Windows
+// Implementation for Windows
 std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
     std::array<char, 128> buffer;
     std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
@@ -18,7 +18,7 @@ std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
 
         if (filterFFmpegSpeed) {
             if (line.find("speed=") != std::string::npos) {
-                // Wyœwietla tylko linie zawieraj¹ce "speed"
+                // Displays only lines containing "speed"
                 std::cout << line.substr(line.find("speed=")) << std::endl;
                 break;
             }
@@ -32,7 +32,7 @@ std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
 }
 
 #else
-// Implementacja dla Linux
+// Implementation for Linux
 std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
     std::array<char, 128> buffer;
     std::string result;
@@ -44,7 +44,7 @@ std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
         std::string line = buffer.data();
         if (filterFFmpegSpeed) {
             if (line.find("speed=") != std::string::npos) {
-                std::cout << line; // Wyœwietla tylko linie ze "speed"
+                std::cout << line; // Displays only lines with "speed"
             }
         }
         else {
@@ -85,12 +85,12 @@ void Commands::manageFFmpegInstallation() {
     std::string ffmpegVersion = checkFFmpegVersion();
 
     if (ffmpegVersion == "not_installed" || ffmpegVersion == "error_executing_command") {
-        std::cout << "FFmpeg nie jest zainstalowany." << std::endl;
-        std::cout << "Czy chcesz zainstalowaæ FFmpeg? [tak/nie]: ";
-        std::string odpowiedz;
-        std::cin >> odpowiedz;
+        std::cout << "FFmpeg is not installed." << std::endl;
+        std::cout << "Do you want to install FFmpeg? [yes/no]: ";
+        std::string response;
+        std::cin >> response;
 
-        if (odpowiedz == "tak") {
+        if (response == "yes") {
 #ifdef _WIN32
             installFFmpegWindows();
 #else
@@ -99,6 +99,7 @@ void Commands::manageFFmpegInstallation() {
         }
     }
     else {
-        std::cout << "Zainstalowana wersja FFmpeg: " << ffmpegVersion << std::endl;
+        std::cout << "Installed FFmpeg version: " << ffmpegVersion << std::endl;
     }
 }
+

@@ -401,3 +401,4 @@ FodyWeavers.xsd
 AUTOMATE_FFMPEG/AUTOMATE_FFMPEG/ffprobe_output.json
 AUTOMATE_FFMPEG/AUTOMATE_FFMPEG/ffprobe_output.json
 *.mkv
+*.jpg

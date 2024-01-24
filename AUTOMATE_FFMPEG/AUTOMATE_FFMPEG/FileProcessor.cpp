@@ -12,6 +12,12 @@ void FileProcessor::processFiles(std::function<void(const std::string&, const st
     fs::path sourcePath(sourceDirectory);
     fs::path targetPath(targetDirectory);
 
+    // Checking if the source folder exists
+    if (!fs::exists(sourcePath) || !fs::is_directory(sourcePath)) {
+        std::cerr << "The source folder does not exist or is invalid: " << sourceDirectory << std::endl;
+        return; // Terminate the function if the source folder does not exist
+    }
+
     int totalFiles = std::count_if(fs::recursive_directory_iterator(sourcePath),
         fs::recursive_directory_iterator{},
         [](const auto& entry) { return entry.is_regular_file(); });
@@ -20,11 +26,9 @@ void FileProcessor::processFiles(std::function<void(const std::string&, const st
 
     for (const auto& entry : fs::recursive_directory_iterator(sourcePath)) {
         if (entry.is_regular_file()) {
-            // Tworzymy œcie¿kê docelow¹ zachowuj¹c strukturê katalogów
             fs::path relativePath = fs::relative(entry.path(), sourcePath);
             fs::path outputPath = targetPath / relativePath;
 
-            // Tworzenie katalogów w œcie¿ce docelowej, jeœli nie istniej¹
             fs::create_directories(outputPath.parent_path());
 
             if (!fs::exists(outputPath)) {
