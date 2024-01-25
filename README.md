@@ -2,7 +2,7 @@
 
 ## Overview
 
-Video Processing Tool is a comprehensive command-line application designed to streamline the process of video encoding and manipulation. It allows users to choose video, audio, and subtitle streams, set various encoding parameters, and process videos efficiently.
+Video Processing Tool is a comprehensive command-line application designed for efficient video encoding and manipulation. It not only allows users to choose specific video, audio, and subtitle streams and set various encoding parameters but also enables processing of entire hierarchies of folders and hundreds of videos in a streamlined manner. This makes it ideal for bulk video processing tasks.
 
 ## Features
 
@@ -13,6 +13,7 @@ Video Processing Tool is a comprehensive command-line application designed to st
 - **Select Resolution Limit**: Set a maximum resolution limit for video output.
 - **Choose Encoder Type**: Select between different encoder types (CPU/GPU-based).
 - **Check Settings**: Review the current configuration and settings.
+- **Progress Bar**: Visual progress indication for tracking the encoding process of each video, enhancing the user experience and providing clear feedback on the processing status.
 
 ## Screenshots
 
