@@ -39,9 +39,9 @@ This screenshot displays the settings overview section, where users can review t
 
 ## Installation
 
-Installing the Video Processing Tool is straightforward:
+Installing the AUTOMATE_FFMPEG is straightforward:
 
-1. **Executable File**: Simply download the `.exe` file of the Video Processing Tool. There is no need for a complex installation process.
+1. **Executable File**: Simply download the `.exe` file of the AUTOMATE_FFMPEG. There is no need for a complex installation process.
 
 2. **FFmpeg Dependency**:
    - On **Linux**, you can install FFmpeg using the package manager. Open a terminal and run:
@@ -55,7 +55,7 @@ Installing the Video Processing Tool is straightforward:
 
 3. **Running the Program**: To use the tool, run the downloaded executable. It can be launched directly from the command line or by double-clicking the file in a file explorer.
 
-With FFmpeg installed and the executable ready, you can start using the Video Processing Tool right away.
+With FFmpeg installed and the executable ready, you can start using the AUTOMATE_FFMPEG right away.
 
 ## Usage
 
