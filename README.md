@@ -14,6 +14,28 @@ Video Processing Tool is a comprehensive command-line application designed to st
 - **Choose Encoder Type**: Select between different encoder types (CPU/GPU-based).
 - **Check Settings**: Review the current configuration and settings.
 
+## Screenshots
+
+### Main Menu
+
+![image](https://github.com/dam2452/AUTOMATE_FFMPEG/assets/81230036/ecab20ef-4969-40dc-b26d-da6303e852e5)
+
+This screenshot shows the main menu of the Video Processing Tool, where users can select various options.
+
+### Processing Window
+
+![Processing Window](url-to-screenshot-of-processing-window)
+
+Here you can see the tool in action, processing a video file with the selected settings.
+
+### Settings Overview
+
+![image](https://github.com/dam2452/AUTOMATE_FFMPEG/assets/81230036/cb92d9f8-9d6e-4da3-b7a0-93282c87b750)
+
+This screenshot displays the settings overview section, where users can review their current configuration.
+
+
+
 ## Installation
 
 Installing the Video Processing Tool is straightforward:
