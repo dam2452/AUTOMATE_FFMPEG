@@ -58,7 +58,6 @@ private:
     bool isCompatibleAudio(const nlohmann::json& stream) const;
     bool isCompatibleSubtitle(const nlohmann::json& stream);
     bool isCompatibleVideo(const nlohmann::json& stream) const;
-    bool isStandardVideoStream(const nlohmann::json& stream) const;
 
     std::string processAudioStreams(const std::vector<nlohmann::json>& streams);
     std::string processVideoStreams(const std::vector<nlohmann::json>& streams);

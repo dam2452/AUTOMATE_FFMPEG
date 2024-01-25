@@ -184,7 +184,7 @@ std::string FFmpegCommandBuilder::generateSelectorForAllStreamsOfType(
 std::string FFmpegCommandBuilder::generateEncoderOptions() const {
     std::ostringstream encoderOptions;
     if (encoderType == EncoderType::GPU) {
-        encoderOptions << " -c:v hevc_nvenc -preset slow";
+        encoderOptions << " -c:v hevc_nvenc -preset slow -cq "<<cqValue;
         // Additional GPU encoder options can be added here if needed.
     }
     else if (encoderType == EncoderType::CPU) {
@@ -197,7 +197,8 @@ std::string FFmpegCommandBuilder::generateEncoderOptions() const {
             << " -row-mt 1"       // Enable row-based multithreading
             << " -speed 2"        // Speed setting
             << " -auto-alt-ref 1" // Enable automatic alternate reference frames
-            << " -lag-in-frames 25"; // Number of frames to consider for lag
+            << " -lag-in-frames 25" // Number of frames to consider for lag
+            << " -cq "<<cqValue;  // Constant quality level
         // Additional CPU encoder options can be added here.
     }
     return encoderOptions.str();
