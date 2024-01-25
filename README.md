@@ -73,4 +73,4 @@ Contributions to the AUTOMATE_FFMPEG are welcome. Please ensure you follow our c
 
 ## License
 
-The Video Processing Tool is open-source software licensed under the MIT License.
+The AUTOMATE_FFMPEG is open-source software licensed under the MIT License.
