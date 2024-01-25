@@ -7,7 +7,9 @@
 
 class VideoProcessor {
 public:
-    VideoProcessor() : maxResolution(1080), cqValue(28), encoderType(EncoderType::GPU), sourcePath("XYZ"), destinationPath("XYZOUT") {}
+    VideoProcessor() : maxResolution(1080), cqValue(28), encoderType(EncoderType::GPU), sourcePath("XYZ"), destinationPath("XYZOUT"), additionalFlags("-loglevel quiet") {}
+
+    //DEBUG , additionalFlags("-loglevel quiet")
 
     // Methods corresponding to menu items
     void choosePaths();

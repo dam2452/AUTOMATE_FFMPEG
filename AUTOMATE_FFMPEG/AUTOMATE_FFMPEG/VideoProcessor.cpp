@@ -38,7 +38,7 @@ void VideoProcessor::processVideoFile(const std::string& filePath, const std::st
     FFmpegCommandBuilder builder(filePath, outputDir, maxResolution, cqValue, additionalFlags, selectedVideoStreams, selectedAudioStreams, selectedSubtitleStreams, encoderType, ".mp4");
     std::string command = builder.buildCommand();
 
-    std::cout << "Generated FFmpeg command: " << command << std::endl;
+    //std::cout << "Generated FFmpeg command: " << command << std::endl;     //DEBUG
 
     // Execute FFmpeg command
     Commands::execute(command, true);
