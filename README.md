@@ -2,7 +2,7 @@
 
 ## Overview
 
-Video Processing Tool is a comprehensive command-line application designed for efficient video encoding and manipulation. It not only allows users to choose specific video, audio, and subtitle streams and set various encoding parameters but also enables processing of entire hierarchies of folders and hundreds of videos in a streamlined manner. This makes it ideal for bulk video processing tasks.
+AUTOMATE_FFMPEG is a comprehensive command-line application designed for efficient video encoding and manipulation. It not only allows users to choose specific video, audio, and subtitle streams and set various encoding parameters but also enables processing of entire hierarchies of folders and hundreds of videos in a streamlined manner. This makes it ideal for bulk video processing tasks.
 
 ## Features
 
@@ -21,7 +21,7 @@ Video Processing Tool is a comprehensive command-line application designed for e
 
 ![image](https://github.com/dam2452/AUTOMATE_FFMPEG/assets/81230036/ecab20ef-4969-40dc-b26d-da6303e852e5)
 
-This screenshot shows the main menu of the Video Processing Tool, where users can select various options.
+This screenshot shows the main menu of the AUTOMATE_FFMPEG, where users can select various options.
 
 ### Processing Window
 
