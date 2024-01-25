@@ -38,32 +38,24 @@ bool FFmpegCommandBuilder::isCompatibleSubtitle(const nlohmann::json& stream) {
 }
 
 bool FFmpegCommandBuilder::isCompatibleVideo(const nlohmann::json& stream) const {
-    // Ensure the stream is of type 'video' and not just a single-frame image (e.g., cover art)
+    // Check if the stream is of type 'video'
     if (stream.value("codec_type", "") != "video") {
         return false;
     }
 
+    // Check for single-frame streams (commonly used for cover art)
     if (stream.contains("nb_frames") && stream["nb_frames"].get<std::string>() == "1") {
         return false;
     }
 
-    // Additional compatibility checks can be added here.
-
-    return true; // Default to true if no compatibility issues are found
-}
-
-bool FFmpegCommandBuilder::isStandardVideoStream(const nlohmann::json& stream) const {
-    // Checking if the stream is a video and not a single-frame (like a cover art)
-    if (stream.value("codec_type", "") != "video") {
+    // Check for attached pictures (another form of cover art)
+    if (stream.contains("disposition") && stream["disposition"].value("attached_pic", 0) == 1) {
         return false;
     }
-    if (stream.contains("disposition") && stream["disposition"].value("attached_pic", 0) == 1) {
-        return false; // This is an attached picture, not a standard video stream
-    }
 
-    // Add any additional checks here if needed
+    // Here, you can add additional checks for video stream compatibility
 
-    return true; // The stream is a standard video stream
+    return true; // The stream is a standard and compatible video stream
 }
 
 
@@ -174,11 +166,8 @@ std::string FFmpegCommandBuilder::generateSelectorForAllStreamsOfType(
     std::ostringstream selector;
     for (const auto& stream : allStreams) {
         if (stream["codec_type"] == streamType) {
-            if (streamType == "video") {
-                // Skip non-standard video streams like cover art
-                if (!isStandardVideoStream(stream)) {
-                    continue;
-                }
+            if (streamType == "video" && !isCompatibleVideo(stream)) {
+                continue; // Skip non-compatible video streams
             }
             int streamIndex = stream["index"].get<int>();
             selector << " -map 0:" << streamIndex;
@@ -190,7 +179,6 @@ std::string FFmpegCommandBuilder::generateSelectorForAllStreamsOfType(
     }
     return selector.str();
 }
-
 
 
 std::string FFmpegCommandBuilder::generateEncoderOptions() const {
