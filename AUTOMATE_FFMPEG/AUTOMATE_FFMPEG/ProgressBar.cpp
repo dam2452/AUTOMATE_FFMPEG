@@ -1,7 +1,7 @@
 #include "ProgressBar.h"
 
 ProgressBar::ProgressBar(int total) : total(total), current(0) {
-    startTime = std::chrono::steady_clock::now();  // Zapisz czas startu
+    startTime = std::chrono::steady_clock::now();  // Save start time
 }
 
 void ProgressBar::update(int progress) {
@@ -12,13 +12,13 @@ void ProgressBar::update(int progress) {
 void ProgressBar::complete() {
     current = total;
     display();
-    std::cout << "\nPrzetwarzanie zakonczone.\n";
+    std::cout << "\nProcessing completed.\n";
 }
 
 void ProgressBar::display() const {
     int percent = int(float(current) / total * 100.0);
 
-    std::cout << "\rPostep: " << percent << " %";  // U¿ywamy '\r' do powrotu kursora
+    std::cout << "\rProgress: " << percent << " %";  // We use '\r' to return the cursor
 
     if (current > 0 && current < total) {
         auto now = std::chrono::steady_clock::now();
@@ -26,12 +26,12 @@ void ProgressBar::display() const {
         auto estimatedTotalTime = static_cast<long long>(timeElapsed) * total / current;
         auto remainingTime = estimatedTotalTime - timeElapsed;
 
-        // Konwersja czasu na godziny, minuty i sekundy
+        // Convert time to hours, minutes, and seconds
         int hours = remainingTime / 3600;
         int minutes = (remainingTime % 3600) / 60;
         int seconds = remainingTime % 60;
 
-        std::cout << ", Pozostaly czas: ";
+        std::cout << ", Remaining time: ";
         if (hours > 0) std::cout << hours << " h ";
         if (hours > 0 || minutes > 0) std::cout << minutes << " min ";
         std::cout << seconds << " s ";
@@ -39,4 +39,3 @@ void ProgressBar::display() const {
 
     std::cout.flush();
 }
-
