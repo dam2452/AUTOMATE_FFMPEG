@@ -25,7 +25,7 @@ This screenshot shows the main menu of the Video Processing Tool, where users ca
 
 ### Processing Window
 
-![image](https://github.com/dam2452/AUTOMATE_FFMPEG/assets/81230036/9a144d61-c749-4913-b424-a2f228f6ab10)
+![image](https://github.com/dam2452/AUTOMATE_FFMPEG/assets/81230036/b9391ae4-da72-46d8-ae9b-1dd0f5c6bdce)
 
 Here you can see the tool in action, processing a video file with the selected settings.
 
