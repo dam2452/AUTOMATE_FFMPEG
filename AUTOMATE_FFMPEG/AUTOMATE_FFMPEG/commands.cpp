@@ -4,7 +4,6 @@
 #include <memory>
 
 #ifdef _WIN32
-// Implementation for Windows
 std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
     std::array<char, 128> buffer;
     std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
@@ -18,7 +17,6 @@ std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
 
         if (filterFFmpegSpeed) {
             if (line.find("speed=") != std::string::npos) {
-                // Displays only lines containing "speed"
                 std::cout << line.substr(line.find("speed=")) << std::endl;
                 break;
             }
@@ -32,7 +30,6 @@ std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
 }
 
 #else
-// Implementation for Linux
 std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
     std::array<char, 128> buffer;
     std::string result;
@@ -44,7 +41,7 @@ std::string Commands::execute(const std::string& cmd, bool filterFFmpegSpeed) {
         std::string line = buffer.data();
         if (filterFFmpegSpeed) {
             if (line.find("speed=") != std::string::npos) {
-                std::cout << line; // Displays only lines with "speed"
+                std::cout << line;
             }
         }
         else {
