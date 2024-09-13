@@ -11,7 +11,6 @@ public:
 
     //DEBUG , additionalFlags("-loglevel quiet")
 
-    // Methods corresponding to menu items
     void choosePaths();
     void startProcessing();
     void selectVideoStreams();
