@@ -12,10 +12,9 @@ void FileProcessor::processFiles(VideoProcessor& processor, std::function<void(V
     fs::path sourcePath(sourceDirectory);
     fs::path targetPath(targetDirectory);
 
-    // Check if the source folder exists
     if (!fs::exists(sourcePath) || !fs::is_directory(sourcePath)) {
         std::cerr << "The source folder does not exist or is invalid: " << sourceDirectory << std::endl;
-        return; // Terminate the function if the source folder does not exist
+        return;
     }
 
     int totalFiles = std::count_if(fs::recursive_directory_iterator(sourcePath),
