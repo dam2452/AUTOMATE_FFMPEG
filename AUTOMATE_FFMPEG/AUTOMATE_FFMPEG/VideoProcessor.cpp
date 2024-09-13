@@ -13,7 +13,6 @@ void VideoProcessor::choosePaths()
     std::cout << "Enter source path: ";
     std::getline(std::cin, sourcePath);
 
-    // Checking if the source path is empty
     if (sourcePath.empty()) {
         std::cout << "No source path provided! Press Enter to continue..." << std::endl;
         return;
@@ -22,7 +21,6 @@ void VideoProcessor::choosePaths()
     std::cout << "Enter destination path: ";
     std::getline(std::cin, destinationPath);
 
-    // Checking if the destination path is empty
     if (destinationPath.empty()) {
         std::cout << "No destination path provided! Press Enter to continue..." << std::endl;
         return;
@@ -37,10 +35,6 @@ void VideoProcessor::processVideoFile(const std::string& filePath, const std::st
 
     FFmpegCommandBuilder builder(filePath, outputDir, maxResolution, cqValue, additionalFlags, selectedVideoStreams, selectedAudioStreams, selectedSubtitleStreams, encoderType, ".mp4");
     std::string command = builder.buildCommand();
-
-    //std::cout << "Generated FFmpeg command: " << command << std::endl;     //DEBUG
-
-    // Execute FFmpeg command
     Commands::execute(command, true);
 }
 
@@ -61,8 +55,6 @@ void VideoProcessor::selectVideoStreams()
     std::cout << "Select video streams (default: ALL) (indices separated by commas): ";
     std::string input;
     std::getline(std::cin, input);
-
-    // If input is empty, select all streams
     if (input.empty()) {
         std::cout << "Selected video streams: ALL" << std::endl;
         return;
@@ -73,14 +65,12 @@ void VideoProcessor::selectVideoStreams()
     std::vector<int> validIndices;
     bool invalidInput = false;
 
-    // Parsing the indices
     while (std::getline(iss, token, ',')) {
         try {
             int index = std::stoi(token);
             validIndices.push_back(index);
         }
         catch (...) {
-            // In case of invalid input (non-integer values)
             std::cerr << "Invalid input: " << token << ". Please enter valid indices." << std::endl;
             invalidInput = true;
             break;
@@ -103,7 +93,6 @@ void VideoProcessor::selectAudioStreams()
     std::string input;
     std::getline(std::cin, input);
 
-    // If input is empty, select all streams
     if (input.empty()) {
         std::cout << "Selected audio streams: ALL" << std::endl;
         return;
@@ -114,14 +103,12 @@ void VideoProcessor::selectAudioStreams()
     std::vector<int> validIndices;
     bool invalidInput = false;
 
-    // Parsing the indices
     while (std::getline(iss, token, ',')) {
         try {
             int index = std::stoi(token);
             validIndices.push_back(index);
         }
         catch (...) {
-            // In case of invalid input (non-integer values)
             std::cerr << "Invalid input: " << token << ". Please enter valid indices." << std::endl;
             invalidInput = true;
             break;
@@ -144,7 +131,6 @@ void VideoProcessor::selectSubtitleStreams()
     std::string input;
     std::getline(std::cin, input);
 
-    // If input is empty, select all streams
     if (input.empty()) {
         std::cout << "Selected subtitle streams: ALL" << std::endl;
         return;
@@ -155,14 +141,12 @@ void VideoProcessor::selectSubtitleStreams()
     std::vector<int> validIndices;
     bool invalidInput = false;
 
-    // Parsing the indices
     while (std::getline(iss, token, ',')) {
         try {
             int index = std::stoi(token);
             validIndices.push_back(index);
         }
         catch (...) {
-            // In case of invalid input (non-integer values)
             std::cerr << "Invalid input: " << token << ". Please enter valid indices." << std::endl;
             invalidInput = true;
             break;
@@ -195,19 +179,18 @@ void VideoProcessor::selectCQ()
             cqValue = std::stoi(input);
         }
         else {
-            cqValue = 28; // Default value
+            cqValue = 28;
         }
         std::cout << "Selected CQ: " << cqValue << std::endl;
     }
     catch (const std::invalid_argument& e) {
-        // If the string cannot be converted to an integer
+
         std::cerr << "Invalid input. Please enter a valid number." << std::endl;
-        cqValue = 28; // Default value
+        cqValue = 28;
     }
     catch (const std::out_of_range& e) {
-        // If the number is too large
         std::cerr << "Number is out of range. Please enter a smaller number." << std::endl;
-        cqValue = 28; // Default value
+        cqValue = 28;
     }
 }
 
