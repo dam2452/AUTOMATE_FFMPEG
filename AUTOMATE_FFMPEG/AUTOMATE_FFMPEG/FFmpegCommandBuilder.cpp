@@ -26,37 +26,30 @@ FFmpegCommandBuilder::FFmpegCommandBuilder(const std::string& inputFilePath,
 
 
 bool FFmpegCommandBuilder::isCompatibleAudio(const nlohmann::json& stream) const {
-    // Check if the audio codec is compatible (aac or eac3)
     const std::string codec = stream.value("codec_name", "");
     return (codec == "aac" || codec == "eac3");
 }
 
 bool FFmpegCommandBuilder::isCompatibleSubtitle(const nlohmann::json& stream) {
-    // Check if the subtitle codec is compatible (mov_text or another compatible format)
     std::string codecName = stream.value("codec_name", "");
     return (codecName == "mov_text" || codecName == "different_compatible_format");
 }
 
 bool FFmpegCommandBuilder::isCompatibleVideo(const nlohmann::json& stream) const {
-    // Check if the stream is of type 'video'
     if (stream.value("codec_type", "") != "video") {
         return false;
     }
 
-    // Check for single-frame streams (commonly used for cover art)
     if (stream.contains("nb_frames") && stream["nb_frames"].get<std::string>() == "1") {
         return false;
     }
 
-    // Check for attached pictures (another form of cover art)
     if (stream.contains("disposition") && stream["disposition"].value("attached_pic", 0) == 1) {
         return false;
     }
 
-    // Here, you can add additional checks for video stream compatibility
 
-    return true; // The stream is a standard and compatible video stream
-}
+    return true;
 
 
 std::string FFmpegCommandBuilder::processSubtitleStreams(const std::vector<nlohmann::json>& streams) {
@@ -86,14 +79,12 @@ std::string FFmpegCommandBuilder::processAudioStreams(const std::vector<nlohmann
 }
 
 std::string FFmpegCommandBuilder::processVideoStreams(const std::vector<nlohmann::json>& streams) {
-    // Process video streams to generate video encoding options.
     std::ostringstream videoCmd;
 
-    // Assuming we need options for the first compatible video stream only.
     for (const auto& stream : streams) {
         if (isCompatibleVideo(stream)) {
             videoCmd << generateEncoderOptions();
-            break; // Exit loop after finding the first compatible stream.
+            break;
         }
     }
 
@@ -101,9 +92,6 @@ std::string FFmpegCommandBuilder::processVideoStreams(const std::vector<nlohmann
 }
 
 std::string FFmpegCommandBuilder::generateVideoFilter() const {
-    // Generates a video filter string for scaling the video.
-    // If maxResolution is set, the video is scaled to a maximum height of maxResolution,
-    // while maintaining the aspect ratio.
     if (maxResolution > 0) {
         return "scale=-1:min(" + std::to_string(maxResolution) + R"(\,ih))";
     }
@@ -118,21 +106,18 @@ std::string FFmpegCommandBuilder::generateStreamSelectors(
     std::ostringstream selectors;
 
     if (videoStreams.empty()) {
-        // Select all video streams if vector is empty
         selectors << generateSelectorForAllStreamsOfType("video", streams);
     } else {
         selectors << generateSelectorForStreamType(videoStreams, "v", streams);
     }
 
     if (audioStreams.empty()) {
-        // Select all audio streams if vector is empty
         selectors << generateSelectorForAllStreamsOfType("audio", streams);
     } else {
         selectors << generateSelectorForStreamType(audioStreams, "a", streams);
     }
 
     if (subtitleStreams.empty()) {
-        // Select all subtitle streams if vector is empty
         selectors << generateSelectorForAllStreamsOfType("subtitle", streams);
     } else {
         selectors << generateSelectorForStreamType(subtitleStreams, "s", streams);
@@ -185,21 +170,20 @@ std::string FFmpegCommandBuilder::generateEncoderOptions() const {
     std::ostringstream encoderOptions;
     if (encoderType == EncoderType::GPU) {
         encoderOptions << " -c:v hevc_nvenc -preset slow -cq "<<cqValue;
-        // Additional GPU encoder options can be added here if needed.
     }
     else if (encoderType == EncoderType::CPU) {
         // libx265 settings for CPU encoding
         encoderOptions << " -c:v libx265"
-            << " -cpu-used 4"      // Set CPU usage
-            << " -threads 16"     // Number of threads to use
-            << " -tile-columns 2" // Number of tile columns
-            << " -tile-rows 1"    // Number of tile rows
-            << " -row-mt 1"       // Enable row-based multithreading
-            << " -speed 2"        // Speed setting
-            << " -auto-alt-ref 1" // Enable automatic alternate reference frames
-            << " -lag-in-frames 25" // Number of frames to consider for lag
-            << " -cq "<<cqValue;  // Constant quality level
-        // Additional CPU encoder options can be added here.
+            << " -cpu-used 4"
+            << " -threads 16"
+            << " -tile-columns 2
+            << " -tile-rows 1"
+            << " -row-mt 1"
+            << " -speed 2"
+            << " -auto-alt-ref 1"
+            << " -lag-in-frames 25"
+            << " -cq "<<cqValue;
+
     }
     return encoderOptions.str();
 }
@@ -208,7 +192,7 @@ std::string FFmpegCommandBuilder::createOutputFileName() const {
 
     std::string outputDirectoryCopy = outputDirectory;
     if (outputDirectoryCopy.size() >= 4) {
-        outputDirectoryCopy.erase(outputDirectoryCopy.size() - 4);  // Removes the last three characters
+        outputDirectoryCopy.erase(outputDirectoryCopy.size() - 4);
     }
 
     return outputDirectoryCopy + "_CQ" + std::to_string(cqValue) + extension;
@@ -216,7 +200,6 @@ std::string FFmpegCommandBuilder::createOutputFileName() const {
 
 
 std::string FFmpegCommandBuilder::buildCommand() {
-    // Analyze the media file to get stream information
     if (!ffprobe.analyze()) {
         std::cerr << "Failed to analyze file: " << inputFilePath << std::endl;
         return "";
@@ -224,28 +207,23 @@ std::string FFmpegCommandBuilder::buildCommand() {
     auto streams = ffprobe.getStreams();
 
     std::ostringstream cmd;
-    cmd << "ffmpeg -i \"" << inputFilePath << "\""; // Input file
+    cmd << "ffmpeg -i \"" << inputFilePath << "\"";
 
-    // Apply video filter if necessary
     std::string videoFilter = generateVideoFilter();
     if (!videoFilter.empty()) {
         cmd << " -vf \"" << videoFilter << "\"";
     }
 
-    // Add selectors for video, audio, and subtitle streams
     cmd << generateStreamSelectors(videoStreams, audioStreams, subtitleStreams, streams);
 
-    // Process audio, video, and subtitle streams
     cmd << processAudioStreams(streams);
     cmd << processVideoStreams(streams);
     cmd << processSubtitleStreams(streams);
 
-    // Append additional flags if any
     if (!additionalFlags.empty()) {
         cmd << " " << additionalFlags;
     }
 
-    // Specify the output file
     cmd << " \"" << createOutputFileName() << "\"";
 
     return cmd.str();
